@@ -1,1 +1,1 @@
-This is the code for my website, feel free to send me an email telling me how bad my code is (surprise: I already know).
+This is the code for my website, feel free to send me an email with any questions or comments! I'm a beginner coder, so this website is both a way for me to practice my code and learn, as well as an opportinuty to show my Resume and work in an interesting way. Thank you for checking it out!
