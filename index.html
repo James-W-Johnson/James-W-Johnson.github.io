@@ -1,43 +1,578 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<link rel="stylesheet" href="styles.css">
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>James Johnson's Website</title>
-	<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="James Johnson - Cybersecurity-Focused Computer Science Student. Portfolio showcasing secure software development, technical projects, and problem-solving skills.">
+    <meta name="keywords" content="James Johnson, Computer Science, Cybersecurity, Software Engineering, Portfolio, Resume">
+    <meta name="author" content="James Johnson">
+    <title>James Johnson | Cybersecurity-Focused Computer Science Student</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#hero" class="skip-link">Skip to main content</a>
+    
+    <!-- Navigation -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <div class="nav-brand">JJ</div>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="mode-toggle" id="modeToggle" aria-label="Toggle between technical and creative mode">
+                <span class="toggle-text">Creative Mode</span>
+                <span class="toggle-icon">🎨</span>
+            </button>
+        </div>
+    </nav>
 
-<!-- This is the landing page for the website -->
-<!-- Name | CSU: San Bernardiino Computer Science: Cybersecurity Student | Resume -->
+    <!-- Main Container with Flip Effect -->
+    <div class="flip-container" id="flipContainer">
+        <!-- Technical Mode (Front) -->
+        <div class="flip-card technical-mode" id="technicalCard">
+            <!-- Hero Section -->
+            <section class="hero" id="hero">
+                <div class="hero-content">
+                    <h1 class="hero-name">James Johnson</h1>
+                    <p class="hero-title">Cybersecurity-Focused Computer Science Student</p>
+                    <p class="hero-tagline">Cybersecurity-focused computer science student with hands-on experience in secure application development, system troubleshooting, and Python-based projects. Strong foundation in authentication, access control, and operating systems, with a practical, security-first approach to building reliable software.</p>
+                    <div class="hero-buttons">
+                        <a href="#projects" class="btn btn-primary">View Projects</a>
+                        <a href="#contact" class="btn btn-secondary">Contact Me</a>
+                    </div>
+                </div>
+            </section>
 
-<!-- Navagation Menu -->
-<nav>
-	<ul>
-		<li><a href="index.html">Home</a></li>
-		<li><a href="skills.html">Skills</a></li>
-		<li><a href="experience.html">Experience</a></li>
-		<li><a href="projects.html">Projects</a></li>
-		<li><a href="education.html">Education</a></li>
-		<li><a href="volunteer.html">Volunteer Work</a></li>
-		<li><a href="contact.html">Contact & Links</a></li>
-	</ul>
-</nav>
+            <!-- About Section -->
+            <section class="about" id="about">
+                <div class="container">
+                    <h2 class="section-title">About Me</h2>
+                    <div class="about-content">
+                        <div class="about-text">
+                            <p>I'm a Computer Science student with a Cybersecurity concentration, graduating in May 2026. With a GPA of 3.5, I've built a strong foundation in secure software development, authentication & access control, operating systems, and networking fundamentals.</p>
+                            <p>What sets me apart is my ability to quickly learn new technologies, collaborate effectively in team environments, and approach every development challenge with a security-first mindset. I combine theoretical knowledge with hands-on experience from real-world IT support roles and personal projects.</p>
+                            <p>I'm actively seeking cybersecurity and software engineering internship opportunities where I can contribute to building secure, scalable systems while continuing to grow as a security-minded developer.</p>
+                        </div>
+                        <div class="about-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">3.5</div>
+                                <div class="stat-label">GPA</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">2026</div>
+                                <div class="stat-label">Graduation</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">B.S.</div>
+                                <div class="stat-label">
+                                    <span class="stat-label-line">Computer Science</span>
+                                    <span class="stat-label-line">Cybersecurity Concentration</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<!-- Page content -->
-<section id="index">
-	<h2>Home</h2>
-</section>
+            <!-- Skills Section -->
+            <section class="skills" id="skills">
+                <div class="container">
+                    <h2 class="section-title">Skills</h2>
+                    <div class="skills-grid">
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Programming & Scripting</h3>
+                            <ul class="skill-list">
+                                <li>Python</li>
+                                <li>SQL</li>
+                                <li>R</li>
+                            </ul>
+                        </div>
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Operating Systems</h3>
+                            <ul class="skill-list">
+                                <li>Linux</li>
+                                <li>Windows</li>
+                                <li>macOS</li>
+                            </ul>
+                        </div>
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Security</h3>
+                            <ul class="skill-list">
+                                <li>Authentication</li>
+                                <li>Access Control</li>
+                                <li>Threat Modeling</li>
+                                <li>Vulnerability Assessment</li>
+                                <li>Penetration Testing Fundamentals</li>
+                            </ul>
+                        </div>
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Networking</h3>
+                            <ul class="skill-list">
+                                <li>TCP/IP</li>
+                                <li>OSI Model</li>
+                                <li>DNS</li>
+                                <li>Basic Routing & Switching</li>
+                            </ul>
+                        </div>
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Tools & Platforms</h3>
+                            <ul class="skill-list">
+                                <li>GitHub</li>
+                                <li>Tableau</li>
+                                <li>Google Cloud</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<!-- Name and location -->
-<h1> <p style="text-align: center;"> James Johnson </p> </h1>
-<h2> <p style="text-align: center;"> Cybersecurity Student, </p> </h3>
-<h3> <p style="text-align: center;"> Welcome, this is my website to showcase all of the information that might not be found on my <a href="resume.html">Resume.</a> Thank you for visiting! </p> </h>
+            <!-- Projects Section -->
+            <section class="projects" id="projects">
+                <div class="container">
+                    <h2 class="section-title">Projects</h2>
+                    <div class="projects-grid">
+                        <article class="project-card">
+                            <div class="project-icon">🔐</div>
+                            <h3 class="project-title">Secure SQL Database + Web Frontend</h3>
+                            <p class="project-description">Developed a secure web application with encrypted password storage and robust authentication mechanisms. Implemented proper access control and secure session management.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">Python</span>
+                                <span class="tech-tag">SQL</span>
+                                <span class="tech-tag">HTML/CSS</span>
+                                <span class="tech-tag">Encryption</span>
+                            </div>
+                            <div class="project-highlight">Security Focus: Password encryption, authentication, access control</div>
+                        </article>
 
-<p></p>
+                        <article class="project-card">
+                            <div class="project-icon">🛡️</div>
+                            <h3 class="project-title">Penetration Testing Labs</h3>
+                            <p class="project-description">Hands-on ethical hacking practice through structured penetration testing labs. Performed reconnaissance, vulnerability identification, and comprehensive security reporting.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">Ethical Hacking</span>
+                                <span class="tech-tag">Reconnaissance</span>
+                                <span class="tech-tag">Vulnerability Assessment</span>
+                                <span class="tech-tag">Reporting</span>
+                            </div>
+                            <div class="project-highlight">Security Focus: Ethical hacking, vulnerability assessment, security reporting</div>
+                        </article>
 
-<p style="text-align: center;">Cybersecurity-focused Computer Science student at California State University, San Bernardino (B.S., expected May 2026, GPA 3.5) with a strong passion for securing digital systems and solving complex technical challenges. Experienced in secure application development, system troubleshooting, and Python scripting, with hands-on project work in SQL, Python, and web development. Solid foundation in cybersecurity fundamentals including authentication, access control, operating systems, and data analysis, with a proven ability to learn quickly, collaborate in technical teams, and contribute to innovative cybersecurity solutions.</p>
+                        <article class="project-card">
+                            <div class="project-icon">🌐</div>
+                            <h3 class="project-title">GitHub Personal Website</h3>
+                            <p class="project-description">Built and deployed a professional portfolio website using GitHub Pages with proper DNS configuration and secure deployment practices. Demonstrates web development and DevOps fundamentals.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">GitHub Pages</span>
+                                <span class="tech-tag">DNS</span>
+                                <span class="tech-tag">HTML/CSS/JS</span>
+                                <span class="tech-tag">Secure Deployment</span>
+                            </div>
+                            <div class="project-highlight">Security Focus: Secure deployment practices, DNS configuration</div>
+                        </article>
 
+                        <article class="project-card">
+                            <div class="project-icon">💻</div>
+                            <h3 class="project-title">LeetCode Algorithm Practice</h3>
+                            <p class="project-description">Regular practice solving algorithmic challenges to strengthen problem-solving skills, data structure knowledge, and code optimization techniques.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">Python</span>
+                                <span class="tech-tag">Data Structures</span>
+                                <span class="tech-tag">Algorithms</span>
+                                <span class="tech-tag">Optimization</span>
+                            </div>
+                            <div class="project-highlight">Security Focus: Problem-solving, debugging, optimization</div>
+                        </article>
+
+                        <article class="project-card">
+                            <div class="project-icon">📊</div>
+                            <h3 class="project-title">Data Visualization in R</h3>
+                            <p class="project-description">Created advanced 3D visualizations and analytical insights using R. Demonstrated ability to transform complex data into clear, actionable visualizations.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">R</span>
+                                <span class="tech-tag">3D Visualization</span>
+                                <span class="tech-tag">Data Analysis</span>
+                                <span class="tech-tag">Analytics</span>
+                            </div>
+                            <div class="project-highlight">Security Focus: Data analysis, visualization, analytical insights</div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experience Section -->
+            <section class="experience" id="experience">
+                <div class="container">
+                    <h2 class="section-title">Experience</h2>
+                    <div class="experience-timeline">
+                        <div class="experience-item">
+                            <div class="experience-header">
+                                <h3 class="experience-title">IT Support Specialist</h3>
+                                <span class="experience-type">Technical Support</span>
+                            </div>
+                            <p class="experience-description">Provided comprehensive IT support across multiple systems including POS systems, A/V systems, and macOS & iOS device management. Focused on troubleshooting, maintaining system stability, providing user support, and resolving incidents efficiently. Worked in fast-paced environments requiring quick problem-solving and clear communication with both technical and non-technical users.</p>
+                            <ul class="experience-highlights">
+                                <li>Troubleshooting complex technical issues across multiple platforms</li>
+                                <li>System stability and maintenance for critical business operations</li>
+                                <li>User support and training for various software and hardware systems</li>
+                                <li>Incident resolution and documentation following best practices</li>
+                                <li>Collaboration with cross-functional teams to resolve technical challenges</li>
+                            </ul>
+                        </div>
+
+                        <div class="experience-item">
+                            <div class="experience-header">
+                                <h3 class="experience-title">Cybersecurity Projects & Practice</h3>
+                                <span class="experience-type">Technical Development</span>
+                            </div>
+                            <p class="experience-description">Developed and maintained security-focused projects including secure web applications, penetration testing labs, and secure deployment practices. Applied cybersecurity principles to real-world projects, demonstrating hands-on experience with authentication, encryption, and secure software development.</p>
+                            <ul class="experience-highlights">
+                                <li>Built secure web applications with encrypted password storage</li>
+                                <li>Conducted ethical hacking and penetration testing exercises</li>
+                                <li>Implemented secure deployment practices for web applications</li>
+                                <li>Applied threat modeling and vulnerability assessment techniques</li>
+                            </ul>
+                        </div>
+
+                        <div class="experience-item">
+                            <div class="experience-header">
+                                <h3 class="experience-title">Volunteer Work</h3>
+                                <span class="experience-type">Community Service</span>
+                            </div>
+                            <div class="volunteer-items">
+                                <div class="volunteer-item">
+                                    <h4 class="volunteer-org">Mansion Memories</h4>
+                                    <p class="volunteer-role">Long-term commitment demonstrating teamwork, dedication, and community engagement. Contributed to event planning and execution, working collaboratively with diverse teams to achieve shared goals.</p>
+                                </div>
+                                <div class="volunteer-item">
+                                    <h4 class="volunteer-org">American Red Cross</h4>
+                                    <p class="volunteer-role">Fundraiser Organizer - Planned and executed fundraising events, demonstrating leadership, organizational skills, and the ability to coordinate multiple stakeholders to support important community causes.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section class="contact" id="contact">
+                <div class="container">
+                    <h2 class="section-title">Get In Touch</h2>
+                    <p class="contact-intro">I'm actively seeking cybersecurity and software engineering internship or job opportunities. Let's connect!</p>
+                    <div class="contact-links">
+                        <a href="mailto:jwalkerjohnson@proton.me" class="contact-link" aria-label="Send email">
+                            <span class="contact-icon">✉️</span>
+                            <span class="contact-text">Email</span>
+                        </a>
+                        <a href="https://linkedin.com/in/jwalkerjohnson" target="_blank" rel="noopener noreferrer" class="contact-link" aria-label="Visit LinkedIn profile">
+                            <span class="contact-icon">💼</span>
+                            <span class="contact-text">LinkedIn</span>
+                        </a>
+                        <a href="https://github.com/James-W-Johnson
+                        " target="_blank" rel="noopener noreferrer" class="contact-link" aria-label="Visit GitHub profile">
+                            <span class="contact-icon">🔗</span>
+                            <span class="contact-text">GitHub</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Creative Mode (Back) -->
+        <div class="flip-card creative-mode" id="creativeCard">
+            <!-- Hero Section -->
+            <section class="hero" id="hero-creative">
+                <div class="hero-content">
+                    <h1 class="hero-name">James Johnson</h1>
+                    <p class="hero-title">Creative Technologist & Multimedia Producer</p>
+                    <p class="hero-tagline">I work across film production, post-production, and live AV, delivering reliable solutions in time-sensitive environments. Experienced in managing complex technical workflows from pre-production through final delivery.</p>
+                    <div class="hero-buttons">
+                        <a href="#projects" class="btn btn-primary">See the Work</a>
+                        <a href="#contact" class="btn btn-secondary">Let's Talk</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="about" id="about">
+                <div class="container">
+                    <h2 class="section-title">About Me</h2>
+                    <div class="about-content">
+                        <div class="about-text">
+                            <p>I'm a creative technologist who bridges technical precision and artistic expression. My work spans film production, post-production, live events, and multimedia design—from pre-production planning through final delivery.</p>
+                            <p>I've worked alongside Emmy Award–winning professionals, managing complex on-set logistics and supporting creative workflows in both academic and professional settings. I focus on understanding project requirements and delivering reliable technical solutions in fast-paced production environments.</p>
+                            <p>Seeking opportunities where I can contribute to innovative projects while continuing to grow.</p>
+                            <div class="about-principles">
+                                <h3 class="principles-title">Principles I work by:</h3>
+                                <ul class="principles-list">
+                                    <li>Process matters more than perfection</li>
+                                    <li>Reliability beats flash every time</li>
+                                    <li>Listen first, then solve</li>
+                                    <li>Consistency over perfection</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="about-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">🎬</div>
+                                <div class="stat-label">Film Production</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">🎥</div>
+                                <div class="stat-label">Post-Production</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">🎨</div>
+                                <div class="stat-label">
+                                    <span class="stat-label-line">Creative</span>
+                                    <span class="stat-label-line">Technology</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Skills Section -->
+            <section class="skills" id="skills">
+                <div class="container">
+                    <h2 class="section-title">Skills</h2>
+                    <div class="skills-grid">
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Production & Filmmaking</h3>
+                            <ul class="skill-list">
+                                <li>Production Assistant</li>
+                                <li>Assistant Director</li>
+                                <li>Art Department</li>
+                                <li>Set Building</li>
+                                <li>Cinematography</li>
+                            </ul>
+                        </div>
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Post-Production</h3>
+                            <ul class="skill-list">
+                                <li>Adobe Premiere Pro</li>
+                                <li>DaVinci Resolve</li>
+                                <li>Editing Pipelines</li>
+                                <li>Color Grading</li>
+                                <li>Audio Post</li>
+                            </ul>
+                        </div>
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Design & Multimedia</h3>
+                            <ul class="skill-list">
+                                <li>UI/UX Design</li>
+                                <li>Adobe Photoshop</li>
+                                <li>Adobe Audition</li>
+                                <li>HTML/CSS</li>
+                                <li>Visual Design</li>
+                            </ul>
+                        </div>
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Audiovisual Technology</h3>
+                            <ul class="skill-list">
+                                <li>Live Event AV</li>
+                                <li>Audio Systems</li>
+                                <li>Visual Systems</li>
+                                <li>Equipment Setup</li>
+                                <li>Troubleshooting</li>
+                            </ul>
+                        </div>
+                        <div class="skill-category">
+                            <h3 class="skill-category-title">Collaboration & Leadership</h3>
+                            <ul class="skill-list">
+                                <li>Team Coordination</li>
+                                <li>Mentorship</li>
+                                <li>Project Management</li>
+                                <li>Creative Problem-Solving</li>
+                                <li>Client Communication</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects Section -->
+            <section class="projects" id="projects">
+                <div class="container">
+                    <h2 class="section-title">Projects</h2>
+                    <p class="creative-intro">Work spanning film production, post-production, live events, and multimedia. Process-driven and story-focused projects across diverse creative environments.</p>
+                    <div class="creative-grid">
+                        <article class="project-card">
+                            <div class="project-icon">🎬</div>
+                            <h3 class="project-title">Film & Production Work</h3>
+                            <p class="project-description">Production Assistant, Assistant Director, and Art Department roles. Worked with an Emmy Award–winning set designer, managing logistics and coordinating equipment under tight timelines. Responsibilities included set construction, camera operations, and lighting coordination.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">Lighting</span>
+                                <span class="tech-tag">Cinematography</span>
+                                <span class="tech-tag">Camera Operations</span>
+                                <span class="tech-tag">Set Building</span>
+                            </div>
+                            <div class="project-highlight">Key contributions: problem-solving under pressure, clear communication, and maintaining production workflows</div>
+                        </article>
+
+                        <article class="project-card">
+                            <div class="project-icon">🎥</div>
+                            <h3 class="project-title">Studio & Post-Production Support</h3>
+                            <p class="project-description">Maintained equipment and instructed students in Premiere Pro and DaVinci Resolve in academic and studio environments. Ensured production labs remained operational during active use, providing technical support and troubleshooting.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">Adobe Premiere Pro</span>
+                                <span class="tech-tag">DaVinci Resolve</span>
+                                <span class="tech-tag">Studio Equipment</span>
+                                <span class="tech-tag">Editing Pipelines</span>
+                            </div>
+                            <div class="project-highlight">Key contributions: equipment maintenance, student instruction, and proactive technical support</div>
+                        </article>
+
+                        <article class="project-card">
+                            <div class="project-icon">🎧</div>
+                            <h3 class="project-title">Audiovisual & Live Event Technology</h3>
+                            <p class="project-description">AV Technician for live events. Installed and configured audio/visual systems, performed real-time troubleshooting, and ensured event continuity. Developed and implemented improved workflows to enhance system reliability.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">Live Events</span>
+                                <span class="tech-tag">Audio Systems</span>
+                                <span class="tech-tag">Visual Systems</span>
+                                <span class="tech-tag">Workflow Optimization</span>
+                            </div>
+                            <div class="project-highlight">Key contributions: system installation, real-time troubleshooting, and workflow optimization</div>
+                        </article>
+
+                        <article class="project-card">
+                            <div class="project-icon">🎨</div>
+                            <h3 class="project-title">Design, UI/UX & Multimedia</h3>
+                            <p class="project-description">UI/UX design, multimedia production, and visual interface development. Technologies include HTML, CSS, Java, Adobe Photoshop, and Adobe Audition. Experience in cinematography and audio post-production. Served as joint editor for an art & literary magazine.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">UI/UX Design</span>
+                                <span class="tech-tag">Adobe Photoshop</span>
+                                <span class="tech-tag">Adobe Audition</span>
+                                <span class="tech-tag">HTML/CSS</span>
+                                <span class="tech-tag">Java</span>
+                            </div>
+                            <div class="project-highlight">Key contributions: user-centered design, iterative development, and editorial oversight</div>
+                        </article>
+
+                        <article class="project-card">
+                            <div class="project-icon">🤝</div>
+                            <h3 class="project-title">Long-Term Creative & Volunteer Work</h3>
+                            <p class="project-description">Founding member of a multi-award-winning Yotie Film Club. Long-term set builder for Mansion Memories, collaborating with an Emmy Award–winning set designer. Fundraiser organizer for the American Red Cross. Demonstrated commitment to community engagement and creative collaboration.</p>
+                            <div class="project-tech">
+                                <span class="tech-tag">Film Club</span>
+                                <span class="tech-tag">Mansion Memories</span>
+                                <span class="tech-tag">American Red Cross</span>
+                                <span class="tech-tag">Community Engagement</span>
+                            </div>
+                            <div class="project-highlight">Key contributions: organizational leadership, set construction, and event coordination</div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experience Section -->
+            <section class="experience" id="experience">
+                <div class="container">
+                    <h2 class="section-title">Experience</h2>
+                    <div class="experience-timeline">
+                        <div class="experience-item">
+                            <div class="experience-header">
+                                <h3 class="experience-title">Production Assistant / Assistant Director</h3>
+                                <span class="experience-type">Film Production</span>
+                            </div>
+                            <p class="experience-description">Production Assistant, Assistant Director, and Art Department roles. Worked with an Emmy Award–winning set designer. Managed logistics, coordinated equipment, and handled data backups for multiple camera systems under tight production timelines.</p>
+                            <ul class="experience-highlights">
+                                <li>Coordinated equipment logistics and managed data backups for multiple camera systems</li>
+                                <li>Collaborated with production teams to resolve technical and logistical challenges</li>
+                                <li>Constructed and deconstructed sets according to production schedules</li>
+                                <li>Operated camera equipment with technical precision and creative direction</li>
+                                <li>Troubleshot and resolved technical issues during production</li>
+                            </ul>
+                        </div>
+
+                        <div class="experience-item">
+                            <div class="experience-header">
+                                <h3 class="experience-title">Studio & Post-Production Support</h3>
+                                <span class="experience-type">Academic & Studio</span>
+                            </div>
+                            <p class="experience-description">Academic and studio environments. Maintained equipment, instructed students in Premiere Pro and DaVinci Resolve, and ensured production labs remained operational. Provided technical support and mentorship to students working on production projects.</p>
+                            <ul class="experience-highlights">
+                                <li>Maintained camera equipment, lighting systems, and editing workstations for students</li>
+                                <li>Instructed students in post-production workflows and software applications</li>
+                                <li>Organized and managed media systems and file structures</li>
+                                <li>Maintained lab operations and equipment availability</li>
+                                <li>Supported student workflows and technical troubleshooting</li>
+                            </ul>
+                        </div>
+
+                        <div class="experience-item">
+                            <div class="experience-header">
+                                <h3 class="experience-title">AV Technician</h3>
+                                <span class="experience-type">Live Events</span>
+                            </div>
+                            <p class="experience-description">AV Technician for live events in high-pressure environments. Installed and configured systems, performed real-time troubleshooting, and ensured event continuity. Developed proactive approaches to prevent technical issues during live productions.</p>
+                            <ul class="experience-highlights">
+                                <li>Installed and configured audio/visual systems for 20+ live events, from corporate presentations to performances</li>
+                                <li>Performed real-time troubleshooting and technical problem resolution</li>
+                                <li>Developed and implemented improved workflows to enhance system reliability</li>
+                                <li>Ensured event continuity and seamless technical execution</li>
+                                <li>Conducted pre-event system testing and preparation</li>
+                            </ul>
+                        </div>
+
+                        <div class="experience-item">
+                            <div class="experience-header">
+                                <h3 class="experience-title">University Film Club</h3>
+                                <span class="experience-type">Leadership & Creative Direction</span>
+                            </div>
+                            <p class="experience-description">Founding member of multi-award-winning Yotie Film Club. Provided creative direction, organized events, and mentored members. Established the organization from initial concept to active membership, coordinating monthly screenings and production workshops.</p>
+                            <ul class="experience-highlights">
+                                <li>Co-founded and grew the club from 5 to 40+ active members, organizing monthly screenings and production workshops</li>
+                                <li>Developed and executed creative vision for club programming and events</li>
+                                <li>Planned and coordinated club events, screenings, and workshops</li>
+                                <li>Mentored members in film production techniques and creative development</li>
+                                <li>Maintained long-term organizational commitment and leadership</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section class="contact" id="contact">
+                <div class="container">
+                    <h2 class="section-title">Get In Touch</h2>
+                    <p class="contact-intro">Have a project in mind? Let's talk about what we could build together.</p>
+                    <div class="contact-links">
+                        <a href="mailto:jwalkerjohnson@proton.me" class="contact-link" aria-label="Send email">
+                            <span class="contact-icon">✉️</span>
+                            <span class="contact-text">Email</span>
+                        </a>
+                        <a href="https://linkedin.com/in/jwalkerjohnson" target="_blank" rel="noopener noreferrer" class="contact-link" aria-label="Visit LinkedIn profile">
+                            <span class="contact-icon">💼</span>
+                            <span class="contact-text">LinkedIn</span>
+                        </a>
+                        <a href="https://github.com/James-W-Johnson" target="_blank" rel="noopener noreferrer" class="contact-link" aria-label="Visit GitHub profile">
+                            <span class="contact-icon">🔗</span>
+                            <span class="contact-text">GitHub</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 James Johnson. Built with security-first principles.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
 </body>
 </html>
