@@ -1,138 +1,122 @@
 # James Johnson - Professional Portfolio Website
 
-A modern, professional, mobile-responsive personal portfolio website showcasing technical skills, projects, and experience. Built with a unique dual-mode feature that allows switching between Technical/Resume view and Creative Portfolio view.
+A modern, dual-mode portfolio website showcasing technical skills and creative work. Features a unique toggle system that allows visitors to switch between a Technical/Resume view and a Creative Portfolio view with a smooth 3D flip animation.
 
-## Features
+## 🌟 Features
 
-### Core Features
-- **Dual Mode Design**: Toggle between Technical/Resume mode (default) and Creative Portfolio mode
-- **3D Flip Animation**: Smooth card-flip transition between modes
+### Dual Mode System
+The website operates in two distinct modes:
+
+- **Technical Mode (Default)**: Professional resume-style layout with a dark, technical color palette. Highlights cybersecurity and software engineering skills, projects, and experience.
+
+- **Creative Mode**: Lighter, expressive design with creative typography. Showcases creative projects, film production work, and multimedia experience.
+
+### Key Features
+- **3D Flip Animation**: Smooth card-flip transition when switching between modes
 - **Fully Responsive**: Optimized for all device sizes (mobile, tablet, desktop)
 - **Accessible**: Semantic HTML, ARIA labels, keyboard navigation support
-- **SEO-Friendly**: Proper meta tags, semantic structure
-- **Performance Optimized**: Lightweight, fast-loading, no external dependencies (except fonts)
+- **SEO-Friendly**: Proper meta tags and semantic structure
+- **Performance Optimized**: Lightweight, fast-loading, no external dependencies (except Google Fonts)
+- **Mode Persistence**: Remembers user's preferred mode using localStorage
 
-### Technical Mode (Default)
-- Professional resume-style layout
-- Dark, technical color palette
-- Highlights cybersecurity and software engineering skills
-- Project showcase with security focus
-- Experience and skills sections
-- Contact information
+## 🏗️ How It Works
 
-### Creative Mode
-- Lighter, expressive color palette
-- Creative typography (Playfair Display)
-- Space for creative projects and artistic work
-- Same structure, different aesthetic
+### Architecture
+The website uses a card-flip system where both modes exist simultaneously in the DOM. The JavaScript toggles visibility and positioning to create a seamless transition:
 
-## Project Structure
+1. **Technical Mode Card**: Positioned relatively when active, absolutely when hidden
+2. **Creative Mode Card**: Positioned absolutely when hidden, relatively when active
+3. **Flip Animation**: CSS transitions handle the smooth opacity and position changes
+4. **Mode Toggle Button**: Located in the navbar, updates icon and text based on current mode
+
+### Navigation
+- Fixed navbar with smooth scrolling to sections
+- Active section highlighting as you scroll
+- Mode toggle button with attention animation on page load
+
+### Sections
+
+1. **Hero Section**: Name, title, tagline, and call-to-action buttons
+2. **About Me**: Personal introduction, education, and key strengths
+3. **Skills**: Organized by category (Programming, OS, Security, Networking, Tools)
+4. **Projects**: Detailed project cards with tech stack and descriptions
+5. **Experience**: Professional roles and volunteer work
+6. **Contact**: Email, LinkedIn, and GitHub links
+
+## 📁 Project Structure
 
 ```
 James Professional Website 2/
-├── index.html          # Main HTML file
+├── index.html          # Main HTML file (contains both mode layouts)
 ├── css/
-│   └── styles.css      # All styles (Technical + Creative modes)
+│   └── styles.css      # All styles (Technical + Creative modes, responsive design)
 ├── js/
-│   └── script.js       # JavaScript for interactions
+│   └── script.js       # JavaScript for mode switching, smooth scrolling, animations
 └── README.md           # This file
 ```
 
-## Sections
+## 🛠️ Technologies Used
 
-1. **Hero/Landing**: Name, title, tagline, and call-to-action buttons
-2. **About Me**: Education, GPA, key strengths, and personal brand
-3. **Skills**: Organized by category (Programming, OS, Security, Networking, Tools)
-4. **Projects**: Detailed project cards with tech stack and security focus
-5. **Experience**: IT support roles and volunteer work
-6. **Contact**: Email, LinkedIn, GitHub links
+- **HTML5**: Semantic markup with proper structure
+- **CSS3**: Modern features including Grid, Flexbox, CSS Variables, and smooth transitions
+- **Vanilla JavaScript**: No frameworks - lightweight and performant
+- **Google Fonts**: Inter (primary font) and Playfair Display (creative mode)
 
-## Technologies Used
-
-- **HTML5**: Semantic markup
-- **CSS3**: Modern features (Grid, Flexbox, CSS Variables, Transitions)
-- **Vanilla JavaScript**: No frameworks, lightweight and fast
-- **Google Fonts**: Inter (primary) and Playfair Display (creative mode)
-
-## Browser Support
+## 🌐 Browser Support
 
 - Modern browsers (Chrome, Firefox, Safari, Edge)
 - Mobile browsers (iOS Safari, Chrome Mobile)
 - Graceful degradation for older browsers
 
-## Deployment
+## 🚀 Deployment
 
 ### GitHub Pages
 
-1. Push this repository to GitHub
-2. Go to repository Settings > Pages
-3. Select the main branch as source
+This website is designed to be deployed on GitHub Pages:
+
+1. Push the repository to GitHub
+2. Go to repository **Settings > Pages**
+3. Select the `main` branch as source
 4. Your site will be available at `https://[username].github.io/[repository-name]`
 
-### Custom Domain (Optional)
+### Custom Domain
 
+To use a custom domain:
 1. Add a `CNAME` file in the root with your domain name
 2. Configure DNS records as per GitHub Pages documentation
 3. Update DNS settings in your domain registrar
 
-## Customization
-
-### Update Contact Information
-Edit the contact links in `index.html`:
-- Replace email addresses
-- Update LinkedIn and GitHub URLs
-
-### Add Creative Projects
-Edit the Creative Projects section in `index.html` to add your creative work.
-
-### Color Scheme
-Modify CSS variables in `css/styles.css`:
-- Technical mode: `--tech-*` variables
-- Creative mode: `--creative-*` variables
-
-### Content Updates
-All content is in `index.html`. Update sections as needed:
-- About Me text
-- Skills list
-- Project descriptions
-- Experience details
-
-## Performance
+## ⚡ Performance
 
 - No external JavaScript frameworks
 - Optimized CSS with efficient selectors
-- Lazy loading ready (can be added)
 - Minimal external dependencies (only Google Fonts)
+- Fast page load times
+- Smooth animations with hardware acceleration
 
-## Accessibility
+## ♿ Accessibility
 
 - Semantic HTML5 elements
-- ARIA labels where appropriate
+- ARIA labels for interactive elements
 - Keyboard navigation support
-- Focus indicators
+- Visible focus indicators
 - Respects `prefers-reduced-motion` media query
 - Proper heading hierarchy
-- Alt text ready for images (when added)
+- Screen reader friendly
 
-## Future Enhancements
+## 📱 Responsive Design
 
-- Add actual project images/screenshots
-- Implement dark/light mode toggle (in addition to creative mode)
-- Add blog section
-- Integrate contact form
-- Add analytics (if desired)
-- Expand creative portfolio content
+The website is fully responsive with breakpoints at:
+- **Desktop**: Full layout with all features
+- **Tablet** (≤768px): Adjusted grid layouts, stacked navigation
+- **Mobile** (≤480px): Single column layouts, optimized spacing
 
-## License
+## 📧 Contact
 
-Personal portfolio - All rights reserved.
-
-## Contact
-
-James Johnson
-- Email: [Update in index.html]
-- LinkedIn: [Update in index.html]
-- GitHub: [Update in index.html]
+**James Johnson**
+- Email: jwalkerjohnson@proton.me
+- LinkedIn: [linkedin.com/in/jwalkerjohnson](https://linkedin.com/in/jwalkerjohnson)
+- GitHub: [github.com/James-W-Johnson](https://github.com/James-W-Johnson)
 
 ---
 
