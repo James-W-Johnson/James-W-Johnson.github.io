@@ -27,15 +27,19 @@ function initFlipMode() {
     const modeToggle = document.getElementById('modeToggle');
     const flipContainer = document.getElementById('flipContainer');
     const toggleText = modeToggle.querySelector('.toggle-text');
+    const toggleIcon = modeToggle.querySelector('.toggle-icon');
     
     if (!modeToggle || !flipContainer) return;
     
     modeToggle.addEventListener('click', function() {
         flipContainer.classList.toggle('flipped');
         
-        // Update button text
+        // Update button text and icon
         const isFlipped = flipContainer.classList.contains('flipped');
         toggleText.textContent = isFlipped ? 'Technical Mode' : 'Creative Mode';
+        if (toggleIcon) {
+            toggleIcon.textContent = isFlipped ? '💻' : '🎨';
+        }
         
         // Add/remove class on body for navbar styling
         if (isFlipped) {
@@ -81,12 +85,16 @@ function loadModePreference() {
         const flipContainer = document.getElementById('flipContainer');
         const modeToggle = document.getElementById('modeToggle');
         const toggleText = modeToggle?.querySelector('.toggle-text');
+        const toggleIcon = modeToggle?.querySelector('.toggle-icon');
         
         if (savedMode === 'creative' && flipContainer && !flipContainer.classList.contains('flipped')) {
             flipContainer.classList.add('flipped');
             document.body.classList.add('creative-mode-active');
             if (toggleText) {
                 toggleText.textContent = 'Technical Mode';
+            }
+            if (toggleIcon) {
+                toggleIcon.textContent = '💻';
             }
             if (modeToggle) {
                 modeToggle.setAttribute('aria-label', 'Switch to technical mode');

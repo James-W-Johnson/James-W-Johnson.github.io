@@ -1285,6 +1285,12 @@ section {
         grid-template-columns: 1fr;
     }
     
+    .hero {
+        padding-top: calc(var(--spacing-xl) + 80px);
+        min-height: calc(100vh - 80px);
+        height: auto;
+    }
+    
     .hero-buttons {
         flex-direction: column;
         width: 100%;
@@ -1324,7 +1330,12 @@ section {
     }
     
     .hero {
-        padding: var(--spacing-lg) var(--spacing-sm);
+        padding-top: calc(var(--spacing-lg) + 80px);
+        padding-left: var(--spacing-sm);
+        padding-right: var(--spacing-sm);
+        padding-bottom: var(--spacing-lg);
+        min-height: calc(100vh - 80px);
+        height: auto;
     }
     
     .about-stats {
