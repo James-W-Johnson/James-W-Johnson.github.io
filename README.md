@@ -68,24 +68,6 @@ James Professional Website 2/
 - Mobile browsers (iOS Safari, Chrome Mobile)
 - Graceful degradation for older browsers
 
-## 🚀 Deployment
-
-### GitHub Pages
-
-This website is designed to be deployed on GitHub Pages:
-
-1. Push the repository to GitHub
-2. Go to repository **Settings > Pages**
-3. Select the `main` branch as source
-4. Your site will be available at `https://[username].github.io/[repository-name]`
-
-### Custom Domain
-
-To use a custom domain:
-1. Add a `CNAME` file in the root with your domain name
-2. Configure DNS records as per GitHub Pages documentation
-3. Update DNS settings in your domain registrar
-
 ## ⚡ Performance
 
 - No external JavaScript frameworks
@@ -94,7 +76,7 @@ To use a custom domain:
 - Fast page load times
 - Smooth animations with hardware acceleration
 
-## ♿ Accessibility
+## 🔧 Accessibility
 
 - Semantic HTML5 elements
 - ARIA labels for interactive elements
