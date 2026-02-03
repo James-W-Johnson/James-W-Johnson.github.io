@@ -130,9 +130,9 @@ Personal portfolio - All rights reserved.
 ## Contact
 
 James Johnson
-- Email: [Update in index.html]
-- LinkedIn: [Update in index.html]
-- GitHub: [Update in index.html]
+- Email: jwalkerjohnson@proton.me
+- LinkedIn: https://linkedin.com/in/jwalkerjohnson
+- GitHub: https://github.com/James-W-Johnson
 
 ---
 
