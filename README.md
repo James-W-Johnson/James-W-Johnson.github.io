@@ -101,5 +101,3 @@ The website is fully responsive with breakpoints at:
 - GitHub: [github.com/James-W-Johnson](https://github.com/James-W-Johnson)
 
 ---
-
-Built with security-first principles and attention to detail.
