@@ -96,7 +96,7 @@ The website is fully responsive with breakpoints at:
 ## 📧 Contact
 
 **James Johnson**
-- Email: jwalkerjohnson@proton.me
+- Email: jameswalkerjohnson@gmail.com
 - LinkedIn: [linkedin.com/in/jwalkerjohnson](https://linkedin.com/in/jwalkerjohnson)
 - GitHub: [github.com/James-W-Johnson](https://github.com/James-W-Johnson)
 
