@@ -165,10 +165,19 @@
     .suggestion-item small{color:var(--txt2);display:block;font-size:11px;margin-top:1px}
     .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 
+    /* ── table scroll wrapper ── */
+    .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
     @media(max-width:600px){
+      .app{padding:1rem .75rem 1rem}
       .job-meta-fields{grid-template-columns:1fr}
       .job-settings{flex-direction:column;align-items:flex-start;gap:.6rem}
+      .job-settings .gb-divider{display:none}
       .grand-grid{grid-template-columns:1fr 1fr}
+      .inner-card-header{flex-wrap:wrap;gap:.4rem}
+      .picture-header{flex-wrap:wrap;gap:.5rem}
+      .picture-name-input{min-width:0}
+      .tab-bar-wrap{padding:0 .5rem}
     }
   </style>
 </head>
@@ -297,6 +306,7 @@ const sugEl=document.getElementById('suggestions');
 
 /* ── utils ── */
 function fmtMoney(v){return '$'+parseFloat(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/,',');}
+function roundUp5(v){return Math.ceil(v/5)*5;}
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function getPic(id){return pictures.find(p=>p.id===id);}
 function gMarkup(){return globalMarkupVal;}
@@ -432,6 +442,7 @@ function materialsCardHTML(p){
       <h3><i class="ti ti-package" aria-hidden="true"></i> Materials</h3>
       <div class="section-subtotal">Subtotal: <span id="matSubtotal_${sid}">$0.00</span></div>
     </div>
+    <div class="table-wrap">
     <table class="items-table">
       <thead><tr>
         <th style="min-width:160px">Item</th>
@@ -443,6 +454,7 @@ function materialsCardHTML(p){
       </tr></thead>
       <tbody id="matBody_${sid}"></tbody>
     </table>
+    </div>
     <div class="add-row">
       <div class="add-row-inner">
         <div class="add-row-field" style="flex:2;min-width:180px">
@@ -479,6 +491,7 @@ function laborCardHTML(p){
       <h3><i class="ti ti-tool" aria-hidden="true"></i> Labor</h3>
       <div class="section-subtotal">Subtotal: <span id="laborSubtotal_${sid}">$0.00</span></div>
     </div>
+    <div class="table-wrap">
     <table class="items-table">
       <thead><tr>
         <th style="min-width:160px">Description</th>
@@ -490,6 +503,7 @@ function laborCardHTML(p){
       </tr></thead>
       <tbody id="laborBody_${sid}"></tbody>
     </table>
+    </div>
     <div class="add-row">
       <div class="add-row-inner">
         <div class="add-row-field">
@@ -532,7 +546,7 @@ function renderMaterials(sid){
   const p=getPic(sid);
   if(!p||!p.matItems.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No materials added yet</td></tr>';return;}
   tbody.innerHTML=p.matItems.map(item=>{
-    const total=item.qty*item.unit*(1+item.markup/100);
+    const total=roundUp5(item.qty*item.unit*(1+item.markup/100));
     return `<tr>
       <td><input type="text" value="${escHtml(item.name)}" onchange="updateMaterial(${sid},${item.id},'name',this.value)"></td>
       <td><input type="number" value="${item.qty}" min="1" step="1" onchange="updateMaterial(${sid},${item.id},'qty',this.value)" style="text-align:right"></td>
@@ -549,7 +563,7 @@ function renderLabor(sid){
   const p=getPic(sid);
   if(!p||!p.laborItems.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No labor added yet</td></tr>';return;}
   tbody.innerHTML=p.laborItems.map(item=>{
-    const total=item.techs*item.hours*item.rate;
+    const total=roundUp5(item.techs*item.hours*item.rate);
     const ro=item.type==='drive'?'readonly':'';
     return `<tr>
       <td><input type="text" value="${escHtml(item.desc)}" onchange="updateLabor(${sid},${item.id},'desc',this.value)"></td>
@@ -659,8 +673,8 @@ function recalcTotals(){
   let totalMatCost=0,totalMatBilled=0,totalLabor=0;
   pictures.forEach(p=>{
     let mc=0,mb=0,lt=0;
-    p.matItems.forEach(i=>{const c=i.qty*i.unit;mc+=c;mb+=c*(1+i.markup/100);});
-    p.laborItems.forEach(i=>{lt+=i.techs*i.hours*i.rate;});
+    p.matItems.forEach(i=>{const c=i.qty*i.unit;mc+=c;mb+=roundUp5(c*(1+i.markup/100));});
+    p.laborItems.forEach(i=>{lt+=roundUp5(i.techs*i.hours*i.rate);});
     const el=document.getElementById('matSubtotal_'+p.id);if(el)el.textContent=fmtMoney(mb);
     const le=document.getElementById('laborSubtotal_'+p.id);if(le)le.textContent=fmtMoney(lt);
     totalMatCost+=mc;totalMatBilled+=mb;totalLabor+=lt;
@@ -733,8 +747,8 @@ function buildRows(){
 
   pictures.forEach((p, idx) => {
     let mb = 0, lt = 0;
-    p.matItems.forEach(i  => { mb += i.qty * i.unit * (1 + i.markup / 100); });
-    p.laborItems.forEach(i => { lt += i.techs * i.hours * i.rate; });
+    p.matItems.forEach(i  => { mb += roundUp5(i.qty * i.unit * (1 + i.markup / 100)); });
+    p.laborItems.forEach(i => { lt += roundUp5(i.techs * i.hours * i.rate); });
     totalBilled += mb; totalLabor += lt;
 
     const picName = escHtml(p.name || 'Picture ' + (idx + 1));
@@ -762,7 +776,7 @@ function buildRows(){
           ${cell(escHtml(String(i.qty)),                              1,'left', false,O,W)}
           ${cell(escHtml(i.name),                                     2,'left', false,O,W)}
           ${cell(escHtml(fmtMoney(i.qty*i.unit)),                     1,'right',false,O,W)}
-          ${cell(escHtml(fmtMoney(i.qty*i.unit*(1+i.markup/100))),    1,'right',false,O,W)}
+          ${cell(escHtml(fmtMoney(roundUp5(i.qty*i.unit*(1+i.markup/100)))),    1,'right',false,O,W)}
         </tr>`;
       });
     }
@@ -781,7 +795,7 @@ function buildRows(){
         rows += `<tr>
           ${cell(escHtml(i.desc),                              3,'left', false,O,W)}
           ${cell(escHtml('$'+i.rate+'/hr'),                    1,'right',false,O,W)}
-          ${cell(escHtml(fmtMoney(i.techs*i.hours*i.rate)),   1,'right',false,O,W)}
+          ${cell(escHtml(fmtMoney(roundUp5(i.techs*i.hours*i.rate))),   1,'right',false,O,W)}
         </tr>`;
       });
     }
