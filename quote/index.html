@@ -35,11 +35,21 @@
     .save-status.saved{color:var(--success)}
 
     /* ── job meta ── */
-    .job-meta{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .job-meta{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem}
+    .job-meta-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:.875rem}
     .field-group{display:flex;flex-direction:column;gap:4px}
     .field-group label{font-size:11px;color:var(--txt2);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
     .field-group input{height:36px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:14px}
     .field-group input:focus{outline:none;border-color:var(--focus)}
+    /* settings row — drive time + markup */
+    .job-settings{border-top:1px solid var(--border);padding-top:.75rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:13px;color:var(--txt2)}
+    .setting-group{display:flex;align-items:center;gap:.4rem}
+    .setting-group input{height:28px;width:56px;padding:0 6px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:13px;text-align:right}
+    .setting-group input:focus{outline:none;border-color:var(--focus)}
+    .setting-group button{height:28px;padding:0 10px;border:1px solid var(--border2);border-radius:var(--radius-md);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;white-space:nowrap}
+    .setting-group button:hover{background:var(--card2)}
+    /* helper text under hours when drive time selected */
+    .global-hint{font-size:10px;color:var(--txt3);margin-top:2px;display:none}
 
     /* ── card header inline controls ── */
     .hdr-controls{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
@@ -156,7 +166,8 @@
     .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 
     @media(max-width:600px){
-      .job-meta{grid-template-columns:1fr}
+      .job-meta-fields{grid-template-columns:1fr}
+      .job-settings{flex-direction:column;align-items:flex-start;gap:.6rem}
       .grand-grid{grid-template-columns:1fr 1fr}
     }
   </style>
@@ -175,13 +186,32 @@
   </div>
 
   <div class="job-meta">
-    <div class="field-group">
-      <label>Job name</label>
-      <input type="text" id="quoteName" placeholder="e.g. Panel Upgrade – Smith Residence" oninput="scheduleSave()">
+    <div class="job-meta-fields">
+      <div class="field-group">
+        <label>Job name</label>
+        <input type="text" id="quoteName" placeholder="e.g. Panel Upgrade – Smith Residence" oninput="scheduleSave()">
+      </div>
+      <div class="field-group">
+        <label>Client / Job site</label>
+        <input type="text" id="clientName" placeholder="Client name or address" oninput="scheduleSave()">
+      </div>
     </div>
-    <div class="field-group">
-      <label>Client / Job site</label>
-      <input type="text" id="clientName" placeholder="Client name or address" oninput="scheduleSave()">
+    <div class="job-settings">
+      <div class="setting-group">
+        <i class="ti ti-car" aria-hidden="true"></i>
+        <span>Drive time</span>
+        <input type="number" id="globalDriveHours" value="2" min="0" step="0.25" onchange="setGlobalDriveHours(this.value)">
+        <span>hrs</span>
+        <button onclick="applyGlobalDriveTime()">Apply to all pictures</button>
+      </div>
+      <div class="gb-divider"></div>
+      <div class="setting-group">
+        <i class="ti ti-percentage" aria-hidden="true"></i>
+        <span>Default markup</span>
+        <input type="number" id="globalMarkup" value="45" min="0" step="1" oninput="setGlobalMarkup(this.value)">
+        <span>%</span>
+        <button onclick="applyGlobalMarkup()">Apply to all pictures</button>
+      </div>
     </div>
   </div>
 
@@ -271,7 +301,17 @@ function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function getPic(id){return pictures.find(p=>p.id===id);}
 function gMarkup(){return globalMarkupVal;}
 function setGlobalMarkup(v){globalMarkupVal=parseFloat(v)||0;scheduleSave();}
-function setGlobalDriveHours(v){globalDriveHoursVal=parseFloat(v)||0;updateDriveTimeItems();}
+function setGlobalDriveHours(v){
+  globalDriveHoursVal=parseFloat(v)||0;
+  // Keep hint + locked hours input in sync for the active picture
+  if(activeId){
+    const hint=document.getElementById('driveHint_'+activeId);
+    if(hint&&hint.style.display!=='none') hint.textContent='Global: '+globalDriveHoursVal+' hrs';
+    const t=document.getElementById('laborType_'+activeId);
+    if(t&&t.value==='drive'){const h=document.getElementById('laborHours_'+activeId);if(h)h.value=globalDriveHoursVal;}
+  }
+  scheduleSave();
+}
 function tabLabel(p,idx){
   const name=p.name.trim();
   if(!name) return 'Picture '+(idx+1);
@@ -299,8 +339,8 @@ function loadState(){
   if(!state)return;
   if(state.quoteName) document.getElementById('quoteName').value=state.quoteName;
   if(state.clientName) document.getElementById('clientName').value=state.clientName;
-  if(state.globalMarkup!=null) globalMarkupVal=parseFloat(state.globalMarkup)||45;
-  if(state.globalDriveHours!=null) globalDriveHoursVal=parseFloat(state.globalDriveHours)||2;
+  if(state.globalMarkup!=null){globalMarkupVal=parseFloat(state.globalMarkup)||45;const el=document.getElementById('globalMarkup');if(el)el.value=globalMarkupVal;}
+  if(state.globalDriveHours!=null){globalDriveHoursVal=parseFloat(state.globalDriveHours)||2;const el=document.getElementById('globalDriveHours');if(el)el.value=globalDriveHoursVal;}
   if(Array.isArray(state.pictures)&&state.pictures.length){
     pictures=state.pictures;
     activeId=state.activeId&&pictures.find(p=>p.id===state.activeId)?state.activeId:pictures[0].id;
@@ -390,14 +430,7 @@ function materialsCardHTML(p){
   return `<div class="inner-card">
     <div class="inner-card-header brand">
       <h3><i class="ti ti-package" aria-hidden="true"></i> Materials</h3>
-      <div class="hdr-controls">
-        <span class="lbl">Default markup</span>
-        <input type="number" id="globalMarkup" value="${globalMarkupVal}" min="0" step="1" oninput="setGlobalMarkup(this.value)">
-        <span class="lbl">%</span>
-        <button onclick="applyGlobalMarkup()">Apply all</button>
-        <div class="gb-divider"></div>
-        <div class="section-subtotal">Subtotal: <span id="matSubtotal_${sid}">$0.00</span></div>
-      </div>
+      <div class="section-subtotal">Subtotal: <span id="matSubtotal_${sid}">$0.00</span></div>
     </div>
     <table class="items-table">
       <thead><tr>
@@ -444,14 +477,7 @@ function laborCardHTML(p){
   return `<div class="inner-card">
     <div class="inner-card-header brand">
       <h3><i class="ti ti-tool" aria-hidden="true"></i> Labor</h3>
-      <div class="hdr-controls">
-        <i class="ti ti-car" style="font-size:13px;color:var(--txt2)" aria-hidden="true"></i>
-        <span class="lbl">Drive time</span>
-        <input type="number" id="globalDriveHours" value="${globalDriveHoursVal}" min="0" step="0.25" onchange="setGlobalDriveHours(this.value)">
-        <span class="lbl">hrs</span>
-        <div class="gb-divider"></div>
-        <div class="section-subtotal">Subtotal: <span id="laborSubtotal_${sid}">$0.00</span></div>
-      </div>
+      <div class="section-subtotal">Subtotal: <span id="laborSubtotal_${sid}">$0.00</span></div>
     </div>
     <table class="items-table">
       <thead><tr>
@@ -485,6 +511,7 @@ function laborCardHTML(p){
         <div class="add-row-field">
           <label>Hours</label>
           <input type="number" id="laborHours_${sid}" value="1" min="0" step="0.25" style="width:68px">
+          <span class="global-hint" id="driveHint_${sid}">Global: ${globalDriveHoursVal} hrs</span>
         </div>
         <div class="add-row-field">
           <label>Rate/hr</label>
@@ -562,8 +589,14 @@ function laborTypeChange(sid){
   const t=document.getElementById('laborType_'+sid).value;
   document.getElementById('laborDescField_'+sid).style.display=t==='custom'?'flex':'none';
   const h=document.getElementById('laborHours_'+sid);
-  if(t==='drive'){h.value=globalDriveHoursVal;h.readOnly=true;h.style.background='var(--card2)';}
-  else{h.readOnly=false;h.style.background='';}
+  const hint=document.getElementById('driveHint_'+sid);
+  if(t==='drive'){
+    h.value=globalDriveHoursVal;h.readOnly=true;h.style.background='var(--card2)';
+    if(hint){hint.textContent='Global: '+globalDriveHoursVal+' hrs';hint.style.display='block';}
+  } else {
+    h.readOnly=false;h.style.background='';
+    if(hint)hint.style.display='none';
+  }
 }
 function addLabor(sid){
   const p=getPic(sid);if(!p)return;
@@ -602,6 +635,15 @@ function applyGlobalMarkup(){
     const el=document.getElementById('matMarkup_'+p.id);if(el)el.value=m;
   });
   recalcTotals();scheduleSave();
+}
+function applyGlobalDriveTime(){
+  const h=globalDriveHoursVal;
+  const affected=pictures.filter(p=>p.laborItems.some(i=>i.type==='drive'&&i.hours!==h));
+  if(affected.length){
+    const n=affected.length;
+    if(!confirm(`This will overwrite drive time hours in ${n} picture${n>1?'s':''}. Continue?`)) return;
+  }
+  updateDriveTimeItems();
 }
 function updateDriveTimeItems(){
   const h=globalDriveHoursVal;
