@@ -1,0 +1,823 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quote Builder — Electrical Contractor</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    :root {
+      --bg:        #f0f2f5;
+      --card:      #ffffff;
+      --card2:     #f7f8fa;
+      --border:    #e2e5ea;
+      --border2:   #cdd1d9;
+      --txt:       #111827;
+      --txt2:      #5c6370;
+      --txt3:      #9ca3af;
+      --focus:     #374151;
+      --success:   #16a34a;
+      --danger:    #dc2626;
+      --dangerbg:  #fef2f2;
+      --radius-lg: 10px;
+      --radius-md: 6px;
+      --tab-h:     40px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+    .app{padding:2rem 1rem 1rem;max-width:900px;margin:0 auto}
+
+    /* ── header ── */
+    .header{margin-bottom:1.25rem}
+    .header h1{font-size:22px;font-weight:600;border-left:4px solid #d76600;padding-left:10px}
+    .header p{font-size:13px;color:var(--txt2);margin-top:3px;padding-left:14px}
+    .save-status{font-size:11px;color:var(--txt3);margin-top:5px;height:14px;transition:color .3s}
+    .save-status.saved{color:var(--success)}
+
+    /* ── job meta ── */
+    .job-meta{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field-group{display:flex;flex-direction:column;gap:4px}
+    .field-group label{font-size:11px;color:var(--txt2);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    .field-group input{height:36px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:14px}
+    .field-group input:focus{outline:none;border-color:var(--focus)}
+
+    /* ── card header inline controls ── */
+    .hdr-controls{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+    .hdr-controls span.lbl{font-size:11px;color:var(--txt2);white-space:nowrap}
+    .hdr-controls input{height:24px;width:48px;padding:0 5px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:12px;text-align:right}
+    .hdr-controls input:focus{outline:none;border-color:var(--focus)}
+    .hdr-controls button{height:24px;padding:0 8px;border:1px solid var(--border2);border-radius:var(--radius-md);background:transparent;color:var(--txt2);font-size:11px;cursor:pointer;white-space:nowrap}
+    .hdr-controls button:hover{background:var(--bg)}
+    .gb-divider{width:1px;height:16px;background:var(--border)}
+
+    /* ── tab bar ── */
+    .tab-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none;padding:0 1rem;display:flex;align-items:flex-end;gap:2px;overflow-x:auto;scrollbar-width:none}
+    .tab-bar-wrap::-webkit-scrollbar{display:none}
+    .tab{height:var(--tab-h);padding:0 14px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--txt2);font-size:13px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;flex-shrink:0;margin-bottom:-1px;border-radius:var(--radius-md) var(--radius-md) 0 0;transition:color .15s}
+    .tab:hover{color:var(--txt);background:var(--card2)}
+    .tab.active{color:var(--txt);font-weight:600;border-bottom:2px solid var(--txt);background:var(--card)}
+    .tab-add{height:var(--tab-h);width:36px;border:none;background:transparent;color:var(--txt2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:var(--radius-md)}
+    .tab-add:hover{background:var(--card2);color:var(--txt)}
+
+    /* ── picture content panel ── */
+    .picture-panel{background:var(--card);border:1px solid var(--border);border-radius:0 0 var(--radius-lg) var(--radius-lg);margin-bottom:1rem}
+    .picture-header{padding:.875rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem}
+    .picture-name-input{flex:1;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:14px;font-weight:500}
+    .picture-name-input:focus{outline:none;border-color:var(--focus)}
+    .picture-name-input::placeholder{color:var(--txt3);font-weight:400}
+    .pic-del-btn{height:32px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:transparent;color:var(--txt3);font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+    .pic-del-btn:hover{color:var(--danger);background:var(--dangerbg);border-color:var(--danger)}
+    .picture-body{padding:1rem 1.25rem;display:flex;flex-direction:column;gap:1rem}
+
+    /* ── cards inside panel ── */
+    .inner-card{border:1px solid var(--border);border-radius:var(--radius-lg)}
+    .inner-card-header{padding:.625rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--card2);border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+    .inner-card-header h3{font-size:13px;font-weight:600;color:var(--txt);display:flex;align-items:center;gap:6px}
+    .section-subtotal{font-size:12px;color:var(--txt2)}
+    .section-subtotal span{font-weight:600;color:var(--txt)}
+    /* orange variant for Materials / Labor headers */
+    .inner-card-header.brand{background:#d76600;border-bottom-color:#b85500}
+    .inner-card-header.brand h3{color:#ffffff}
+    .inner-card-header.brand .section-subtotal{color:rgba(255,255,255,.8)}
+    .inner-card-header.brand .section-subtotal span{color:#ffffff}
+    .inner-card-header.brand .hdr-controls span.lbl{color:rgba(255,255,255,.85)}
+    .inner-card-header.brand .hdr-controls input{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);color:#ffffff}
+    .inner-card-header.brand .hdr-controls button{border-color:rgba(255,255,255,.45);color:#ffffff}
+    .inner-card-header.brand .hdr-controls button:hover{background:rgba(255,255,255,.15)}
+    .inner-card-header.brand .gb-divider{background:rgba(255,255,255,.35)}
+
+    /* ── table ── */
+    .items-table{width:100%;border-collapse:collapse}
+    .items-table th{font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+    .items-table td{padding:4px 5px;border-bottom:1px solid var(--border);vertical-align:middle}
+    .items-table tr:last-child td{border-bottom:none}
+    .items-table input,.items-table select{height:29px;padding:0 7px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:13px;width:100%}
+    .items-table input:focus,.items-table select:focus{outline:none;border-color:var(--focus)}
+    .items-table input[readonly]{background:var(--card2);color:var(--txt2)}
+    .line-total{font-size:13px;font-weight:600;color:var(--txt);white-space:nowrap;text-align:right;padding-right:2px}
+    .del-btn{background:none;border:none;cursor:pointer;color:var(--txt3);padding:4px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center}
+    .del-btn:hover{color:var(--danger);background:var(--dangerbg)}
+    .empty-row td{padding:14px 10px;font-size:13px;color:var(--txt3);font-style:italic}
+
+    /* ── add row ── */
+    .add-row{padding:.75rem 1rem;border-top:1px solid var(--border);background:var(--card2);border-radius:0 0 var(--radius-lg) var(--radius-lg)}
+    .add-row-inner{display:flex;gap:7px;align-items:flex-end;flex-wrap:wrap}
+    .add-row-field{display:flex;flex-direction:column;gap:3px}
+    .add-row-field label{font-size:11px;color:var(--txt2);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    .add-row-field input,.add-row-field select{height:30px;padding:0 7px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:13px}
+    .add-row-field input:focus,.add-row-field select:focus{outline:none;border-color:var(--focus)}
+    .add-btn{height:30px;padding:0 12px;border:1px solid #d76600;border-radius:var(--radius-md);background:var(--card);color:#d76600;font-size:13px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;align-self:flex-end;font-weight:500;transition:background .15s,color .15s}
+    .add-btn:hover{background:#d76600;color:#ffffff;border-color:#d76600}
+
+    /* ── $ prefix ── */
+    .input-prefix{display:flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);overflow:hidden}
+    .input-prefix span{padding:0 6px;font-size:13px;color:var(--txt2);background:var(--card2);border-right:1px solid var(--border);height:100%;display:flex;align-items:center;user-select:none}
+    .input-prefix input{border:none;height:100%;padding:0 7px;background:transparent;color:var(--txt);font-size:13px;min-width:0}
+    .input-prefix input:focus{outline:none}
+
+    /* ── grand total footer ── */
+    .grand-footer{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem}
+    .grand-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+    .total-metric{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-md);padding:.625rem .875rem}
+    .total-metric .label{font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:3px}
+    .total-metric .value{font-size:18px;font-weight:600;color:var(--txt)}
+    .total-metric .sub{font-size:11px;color:var(--txt3);margin-top:2px}
+    .total-metric.accent{background:#fff7f0;border-color:#f5c4a0}
+    .total-metric.accent .label{color:#b85500}
+    .total-metric.accent .value{color:#b85500}
+    .total-metric.grand{background:#d76600;border-color:#d76600}
+    .total-metric.grand .label{color:rgba(255,255,255,.8)}
+    .total-metric.grand .value{font-size:24px;color:#ffffff}
+    .total-metric.grand .sub{color:rgba(255,255,255,.75)}
+
+    /* ── page footer ── */
+    .page-footer{text-align:center;padding:1.5rem 0 2rem;font-size:12px;color:var(--txt3)}
+    .page-footer a{color:var(--txt3);text-decoration:none;border-bottom:1px solid var(--border)}
+    .page-footer a:hover{color:var(--txt2)}
+
+    /* ── actions ── */
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+    .action-btn{height:38px;padding:0 18px;border:1px solid var(--border2);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px}
+    .action-btn:hover{background:var(--card2)}
+    .action-btn.primary{background:#1a1f2e;color:#ffffff;border-color:#1a1f2e}
+    .action-btn.primary:hover{background:#2d3449}
+
+    /* ── output ── */
+    .output-modal{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
+    .output-modal.show{display:block}
+    .copy-confirm{font-size:12px;color:var(--success);margin-top:6px;display:none}
+    .copy-confirm.show{display:block}
+
+    /* ── suggestions ── */
+    #suggestions{position:fixed;background:var(--card);border:1px solid var(--border2);border-radius:var(--radius-md);z-index:9999;max-height:220px;overflow-y:auto;box-shadow:0 6px 20px rgba(0,0,0,.12);display:none;min-width:260px}
+    .suggestion-item{padding:8px 12px;font-size:13px;cursor:pointer;color:var(--txt)}
+    .suggestion-item:hover,.suggestion-item.active{background:var(--card2)}
+    .suggestion-item small{color:var(--txt2);display:block;font-size:11px;margin-top:1px}
+    .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+    @media(max-width:600px){
+      .job-meta{grid-template-columns:1fr}
+      .grand-grid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+
+<h2 class="sr-only">Electrical Quote Builder</h2>
+<div id="suggestions"></div>
+
+<div class="app">
+
+  <div class="header">
+    <h1>Quote Builder</h1>
+    <p>Electrical contractor quoting tool</p>
+    <div class="save-status" id="saveStatus">Draft auto-saved to this browser</div>
+  </div>
+
+  <div class="job-meta">
+    <div class="field-group">
+      <label>Job name</label>
+      <input type="text" id="quoteName" placeholder="e.g. Panel Upgrade – Smith Residence" oninput="scheduleSave()">
+    </div>
+    <div class="field-group">
+      <label>Client / Job site</label>
+      <input type="text" id="clientName" placeholder="Client name or address" oninput="scheduleSave()">
+    </div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar-wrap" id="tabBar"></div>
+
+  <!-- Active picture panel -->
+  <div class="picture-panel" id="picturePanel"></div>
+
+  <!-- Grand total footer -->
+  <div class="grand-footer">
+    <div class="grand-grid">
+      <div class="total-metric">
+        <div class="label">Materials cost</div>
+        <div class="value" id="t_matCost">$0.00</div>
+        <div class="sub">Before markup</div>
+      </div>
+      <div class="total-metric accent">
+        <div class="label">Client price</div>
+        <div class="value" id="t_matBilled">$0.00</div>
+        <div class="sub">Materials after markup</div>
+      </div>
+      <div class="total-metric">
+        <div class="label">Labor total</div>
+        <div class="value" id="t_labor">$0.00</div>
+        <div class="sub">No markup on labor</div>
+      </div>
+      <div class="total-metric grand">
+        <div class="label">Grand total</div>
+        <div class="value" id="t_grand">$0.00</div>
+        <div class="sub" id="t_margin"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="action-btn primary" onclick="generateOutput()"><i class="ti ti-copy" aria-hidden="true"></i> Copy formatted quote</button>
+    <button class="action-btn" onclick="clearAll()"><i class="ti ti-trash" aria-hidden="true"></i> Clear all</button>
+  </div>
+
+  <div class="output-modal" id="outputModal">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span style="font-size:13px;font-weight:600">Formatted output</span>
+      <button class="action-btn" onclick="copyOutput()" style="height:28px;font-size:12px"><i class="ti ti-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <div id="outputDiv" style="margin-top:.75rem;overflow-x:auto"></div>
+    <div class="copy-confirm" id="copyConfirm"><i class="ti ti-check" aria-hidden="true"></i> Copied to clipboard — paste directly into Word</div>
+  </div>
+
+  <div class="page-footer">
+    Built for internal use for <strong>SITesting</strong> &nbsp;·&nbsp; <a href="https://jwalkerjohnson.com" target="_blank">jwalkerjohnson.com</a>
+  </div>
+
+</div>
+
+<script>
+const CATALOG=[
+  {name:'Eaton BR 1P 15A Breaker',cat:'Breaker'},{name:'Eaton BR 1P 20A Breaker',cat:'Breaker'},{name:'Eaton BR 1P 30A Breaker',cat:'Breaker'},{name:'Eaton BR 1P 40A Breaker',cat:'Breaker'},{name:'Eaton BR 1P 50A Breaker',cat:'Breaker'},{name:'Eaton BR 1P 60A Breaker',cat:'Breaker'},
+  {name:'Eaton BR 2P 15A Breaker',cat:'Breaker'},{name:'Eaton BR 2P 20A Breaker',cat:'Breaker'},{name:'Eaton BR 2P 30A Breaker',cat:'Breaker'},{name:'Eaton BR 2P 40A Breaker',cat:'Breaker'},{name:'Eaton BR 2P 50A Breaker',cat:'Breaker'},{name:'Eaton BR 2P 60A Breaker',cat:'Breaker'},{name:'Eaton BR 2P 70A Breaker',cat:'Breaker'},{name:'Eaton BR 2P 80A Breaker',cat:'Breaker'},{name:'Eaton BR 2P 90A Breaker',cat:'Breaker'},{name:'Eaton BR 2P 100A Breaker',cat:'Breaker'},
+  {name:'Eaton BR 3P 15A Breaker',cat:'Breaker'},{name:'Eaton BR 3P 20A Breaker',cat:'Breaker'},{name:'Eaton BR 3P 30A Breaker',cat:'Breaker'},{name:'Eaton BR 3P 40A Breaker',cat:'Breaker'},{name:'Eaton BR 3P 50A Breaker',cat:'Breaker'},{name:'Eaton BR 3P 60A Breaker',cat:'Breaker'},{name:'Eaton BR 3P 70A Breaker',cat:'Breaker'},{name:'Eaton BR 3P 80A Breaker',cat:'Breaker'},{name:'Eaton BR 3P 90A Breaker',cat:'Breaker'},{name:'Eaton BR 3P 100A Breaker',cat:'Breaker'},
+  {name:'Eaton BAB 1P 15A Breaker',cat:'Breaker'},{name:'Eaton BAB 1P 20A Breaker',cat:'Breaker'},{name:'Eaton BAB 1P 30A Breaker',cat:'Breaker'},{name:'Eaton BAB 2P 20A Breaker',cat:'Breaker'},{name:'Eaton BAB 2P 30A Breaker',cat:'Breaker'},{name:'Eaton BAB 2P 40A Breaker',cat:'Breaker'},
+  {name:'Eaton GHB 1P 15A Breaker',cat:'Breaker'},{name:'Eaton GHB 1P 20A Breaker',cat:'Breaker'},{name:'Eaton GHB 2P 20A Breaker',cat:'Breaker'},{name:'Eaton GHB 2P 30A Breaker',cat:'Breaker'},{name:'Eaton GHB 2P 40A Breaker',cat:'Breaker'},
+  {name:'Siemens MP-T 1P 15A Breaker',cat:'Breaker'},{name:'Siemens MP-T 1P 20A Breaker',cat:'Breaker'},{name:'Siemens MP-T 1P 30A Breaker',cat:'Breaker'},{name:'Siemens MP-T 2P 20A Breaker',cat:'Breaker'},{name:'Siemens MP-T 2P 30A Breaker',cat:'Breaker'},{name:'Siemens MP-T 2P 40A Breaker',cat:'Breaker'},{name:'Siemens MP-T 2P 50A Breaker',cat:'Breaker'},{name:'Siemens MP-T 2P 60A Breaker',cat:'Breaker'},{name:'Siemens MP-T 2P 100A Breaker',cat:'Breaker'},
+  {name:'Siemens QT 1P 15A Breaker',cat:'Breaker'},{name:'Siemens QT 1P 20A Breaker',cat:'Breaker'},{name:'Siemens QT 2P 20A Breaker',cat:'Breaker'},{name:'Siemens QT 2P 30A Breaker',cat:'Breaker'},{name:'Siemens QT 2P 40A Breaker',cat:'Breaker'},{name:'Siemens QT 2P 100A Breaker',cat:'Breaker'},
+  {name:'GE THQL 1P 15A Breaker',cat:'Breaker'},{name:'GE THQL 1P 20A Breaker',cat:'Breaker'},{name:'GE THQL 2P 20A Breaker',cat:'Breaker'},{name:'GE THQL 2P 30A Breaker',cat:'Breaker'},{name:'GE THQL 2P 40A Breaker',cat:'Breaker'},{name:'GE THQL 2P 60A Breaker',cat:'Breaker'},
+  {name:'GE THQB 1P 15A Breaker',cat:'Breaker'},{name:'GE THQB 2P 20A Breaker',cat:'Breaker'},{name:'GE THQB 2P 30A Breaker',cat:'Breaker'},{name:'GE THQB 3P 30A Breaker',cat:'Breaker'},
+  {name:'GE TEY 1P 15A Breaker',cat:'Breaker'},{name:'GE TEY 1P 20A Breaker',cat:'Breaker'},{name:'GE TEY 2P 20A Breaker',cat:'Breaker'},{name:'GE TEY 2P 30A Breaker',cat:'Breaker'},
+  {name:'1/2" KO Seal',cat:'Material'},{name:'3/4" KO Seal',cat:'Material'},{name:'1" KO Seal',cat:'Material'},{name:'1-1/4" KO Seal',cat:'Material'},{name:'1-1/2" KO Seal',cat:'Material'},{name:'2" KO Seal',cat:'Material'},
+  {name:'6 AWG THHN White (per ft)',cat:'Wire'},{name:'6 AWG THHN Black (per ft)',cat:'Wire'},{name:'6 AWG THHN Red (per ft)',cat:'Wire'},{name:'6 AWG THHN Green (per ft)',cat:'Wire'},
+  {name:'8 AWG THHN White (per ft)',cat:'Wire'},{name:'8 AWG THHN Black (per ft)',cat:'Wire'},{name:'10 AWG THHN White (per ft)',cat:'Wire'},{name:'10 AWG THHN Black (per ft)',cat:'Wire'},{name:'12 AWG THHN White (per ft)',cat:'Wire'},{name:'12 AWG THHN Black (per ft)',cat:'Wire'},{name:'14 AWG THHN White (per ft)',cat:'Wire'},
+  {name:'3M Super 35 Tape Red',cat:'Material'},{name:'3M Super 35 Tape Blue',cat:'Material'},{name:'3M Super 35 Tape Black',cat:'Material'},{name:'3M Super 33+ Tape',cat:'Material'},
+  {name:'1/2" EMT Conduit (per 10ft)',cat:'Conduit'},{name:'3/4" EMT Conduit (per 10ft)',cat:'Conduit'},{name:'1" EMT Conduit (per 10ft)',cat:'Conduit'},{name:'1-1/2" EMT Conduit (per 10ft)',cat:'Conduit'},
+  {name:'1/2" EMT Connector',cat:'Fitting'},{name:'3/4" EMT Connector',cat:'Fitting'},{name:'1" EMT Connector',cat:'Fitting'},{name:'1/2" EMT Coupling',cat:'Fitting'},{name:'3/4" EMT Coupling',cat:'Fitting'},
+  {name:'Wire Nuts (bag)',cat:'Material'},{name:'Electrical Box 1-Gang',cat:'Material'},{name:'Electrical Box 2-Gang',cat:'Material'},{name:'Weatherproof Box',cat:'Material'},
+];
+
+const STORAGE_KEY='eq_draft_v3';
+let pictures=[];   // [{id, name, matItems, laborItems}]
+let activeId=null;
+let globalMarkupVal=45,globalDriveHoursVal=2;
+let sugIdx=-1,dismissTimer=null,saveTimer=null,activeSearchEl=null;
+const sugEl=document.getElementById('suggestions');
+
+/* ── utils ── */
+function fmtMoney(v){return '$'+parseFloat(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/,',');}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function getPic(id){return pictures.find(p=>p.id===id);}
+function gMarkup(){return globalMarkupVal;}
+function setGlobalMarkup(v){globalMarkupVal=parseFloat(v)||0;scheduleSave();}
+function setGlobalDriveHours(v){globalDriveHoursVal=parseFloat(v)||0;updateDriveTimeItems();}
+function tabLabel(p,idx){
+  const name=p.name.trim();
+  if(!name) return 'Picture '+(idx+1);
+  return name.length>24?name.slice(0,22)+'…':name;
+}
+
+/* ── persistence ── */
+function saveState(){
+  const state={
+    quoteName:document.getElementById('quoteName').value,
+    clientName:document.getElementById('clientName').value,
+    globalMarkup:globalMarkupVal,
+    globalDriveHours:globalDriveHoursVal,
+    pictures,activeId
+  };
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
+  const el=document.getElementById('saveStatus');
+  el.textContent='Draft saved';el.classList.add('saved');
+  setTimeout(()=>{el.textContent='Draft auto-saved to this browser';el.classList.remove('saved');},1500);
+}
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveState,600);}
+function loadState(){
+  let state;
+  try{state=JSON.parse(localStorage.getItem(STORAGE_KEY));}catch(e){return;}
+  if(!state)return;
+  if(state.quoteName) document.getElementById('quoteName').value=state.quoteName;
+  if(state.clientName) document.getElementById('clientName').value=state.clientName;
+  if(state.globalMarkup!=null) globalMarkupVal=parseFloat(state.globalMarkup)||45;
+  if(state.globalDriveHours!=null) globalDriveHoursVal=parseFloat(state.globalDriveHours)||2;
+  if(Array.isArray(state.pictures)&&state.pictures.length){
+    pictures=state.pictures;
+    activeId=state.activeId&&pictures.find(p=>p.id===state.activeId)?state.activeId:pictures[0].id;
+  }
+}
+
+/* ── pictures ── */
+function addPicture(){
+  const p={id:Date.now(),name:'',matItems:[],laborItems:[]};
+  pictures.push(p);
+  activeId=p.id;
+  renderTabBar();
+  renderActivePanel();
+  recalcTotals();
+  scheduleSave();
+  // Focus the name input after render
+  setTimeout(()=>{
+    const inp=document.getElementById('pictureName');
+    if(inp)inp.focus();
+  },50);
+}
+function deletePicture(id){
+  const p=getPic(id);
+  const hasData=p&&(p.matItems.length||p.laborItems.length);
+  if(hasData&&!confirm('Delete this picture and all its items?'))return;
+  pictures=pictures.filter(p=>p.id!==id);
+  if(!pictures.length){addPicture();return;}
+  if(activeId===id) activeId=pictures[0].id;
+  renderTabBar();
+  renderActivePanel();
+  recalcTotals();
+  scheduleSave();
+}
+function switchTab(id){
+  activeId=id;
+  renderTabBar();
+  renderActivePanel();
+  scheduleSave();
+}
+function updatePictureName(val){
+  const p=getPic(activeId);if(!p)return;
+  p.name=val;
+  // Update just the tab label without full re-render
+  const idx=pictures.findIndex(p=>p.id===activeId);
+  const tabEl=document.querySelector(`.tab[data-id="${activeId}"]`);
+  if(tabEl){const span=tabEl.querySelector('span');if(span)span.textContent=tabLabel(p,idx);}
+  scheduleSave();
+}
+
+/* ── render tab bar ── */
+function renderTabBar(){
+  const bar=document.getElementById('tabBar');
+  const tabs=pictures.map((p,i)=>{
+    const active=p.id===activeId;
+    return `<button class="tab${active?' active':''}" data-id="${p.id}" onclick="switchTab(${p.id})">
+      <span>${escHtml(tabLabel(p,i))}</span>
+    </button>`;
+  }).join('');
+  bar.innerHTML=tabs+`<button class="tab-add" onclick="addPicture()" title="Add picture">+</button>`;
+}
+
+/* ── render active panel ── */
+function renderActivePanel(){
+  const panel=document.getElementById('picturePanel');
+  const p=getPic(activeId);
+  if(!p){panel.innerHTML='';return;}
+  panel.innerHTML=`
+    <div class="picture-header">
+      <input type="text" id="pictureName" class="picture-name-input"
+        value="${escHtml(p.name)}"
+        placeholder="e.g. (1st Floor, Main Electrical Room, Panel LD) Replace Mismatched Breakers"
+        oninput="updatePictureName(this.value)">
+      <button class="pic-del-btn" onclick="deletePicture(${p.id})">
+        <i class="ti ti-trash" aria-hidden="true"></i> Delete picture
+      </button>
+    </div>
+    <div class="picture-body">
+      ${materialsCardHTML(p)}
+      ${laborCardHTML(p)}
+    </div>`;
+  renderMaterials(p.id);
+  renderLabor(p.id);
+}
+
+function materialsCardHTML(p){
+  const sid=p.id;
+  return `<div class="inner-card">
+    <div class="inner-card-header brand">
+      <h3><i class="ti ti-package" aria-hidden="true"></i> Materials</h3>
+      <div class="hdr-controls">
+        <span class="lbl">Default markup</span>
+        <input type="number" id="globalMarkup" value="${globalMarkupVal}" min="0" step="1" oninput="setGlobalMarkup(this.value)">
+        <span class="lbl">%</span>
+        <button onclick="applyGlobalMarkup()">Apply all</button>
+        <div class="gb-divider"></div>
+        <div class="section-subtotal">Subtotal: <span id="matSubtotal_${sid}">$0.00</span></div>
+      </div>
+    </div>
+    <table class="items-table">
+      <thead><tr>
+        <th style="min-width:160px">Item</th>
+        <th style="width:55px">Qty</th>
+        <th style="width:108px">Unit price</th>
+        <th style="width:62px">Markup %</th>
+        <th style="width:96px">Line total</th>
+        <th style="width:32px"></th>
+      </tr></thead>
+      <tbody id="matBody_${sid}"></tbody>
+    </table>
+    <div class="add-row">
+      <div class="add-row-inner">
+        <div class="add-row-field" style="flex:2;min-width:180px">
+          <label>Item name</label>
+          <input type="text" id="matSearch_${sid}" placeholder="Search or type item…" autocomplete="off"
+            oninput="showSuggestions(event,${sid})" onkeydown="searchKey(event,${sid})"
+            onfocus="showSuggestions(event,${sid})" onblur="scheduleDismiss()">
+        </div>
+        <div class="add-row-field">
+          <label>Qty</label>
+          <input type="number" id="matQty_${sid}" value="1" min="1" style="width:60px">
+        </div>
+        <div class="add-row-field">
+          <label>Unit price</label>
+          <div class="input-prefix" style="width:100px;height:30px">
+            <span>$</span>
+            <input type="number" id="matUnit_${sid}" placeholder="0.00" min="0" step="0.01" style="text-align:right">
+          </div>
+        </div>
+        <div class="add-row-field">
+          <label>Markup %</label>
+          <input type="number" id="matMarkup_${sid}" value="${gMarkup()}" min="0" step="1" style="width:60px">
+        </div>
+        <button class="add-btn" onclick="addMaterial(${sid})"><i class="ti ti-plus" aria-hidden="true"></i> Add</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function laborCardHTML(p){
+  const sid=p.id;
+  return `<div class="inner-card">
+    <div class="inner-card-header brand">
+      <h3><i class="ti ti-tool" aria-hidden="true"></i> Labor</h3>
+      <div class="hdr-controls">
+        <i class="ti ti-car" style="font-size:13px;color:var(--txt2)" aria-hidden="true"></i>
+        <span class="lbl">Drive time</span>
+        <input type="number" id="globalDriveHours" value="${globalDriveHoursVal}" min="0" step="0.25" onchange="setGlobalDriveHours(this.value)">
+        <span class="lbl">hrs</span>
+        <div class="gb-divider"></div>
+        <div class="section-subtotal">Subtotal: <span id="laborSubtotal_${sid}">$0.00</span></div>
+      </div>
+    </div>
+    <table class="items-table">
+      <thead><tr>
+        <th style="min-width:160px">Description</th>
+        <th style="width:55px">Techs</th>
+        <th style="width:72px">Hours</th>
+        <th style="width:108px">Rate/hr</th>
+        <th style="width:96px">Line total</th>
+        <th style="width:32px"></th>
+      </tr></thead>
+      <tbody id="laborBody_${sid}"></tbody>
+    </table>
+    <div class="add-row">
+      <div class="add-row-inner">
+        <div class="add-row-field">
+          <label>Type</label>
+          <select id="laborType_${sid}" onchange="laborTypeChange(${sid})" style="width:115px">
+            <option value="tech">Tech</option>
+            <option value="drive">Drive time</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="add-row-field" id="laborDescField_${sid}" style="display:none;flex:1;min-width:130px">
+          <label>Description</label>
+          <input type="text" id="laborDesc_${sid}" placeholder="Custom labor description">
+        </div>
+        <div class="add-row-field">
+          <label>Techs</label>
+          <input type="number" id="laborTechs_${sid}" value="1" min="1" style="width:58px">
+        </div>
+        <div class="add-row-field">
+          <label>Hours</label>
+          <input type="number" id="laborHours_${sid}" value="1" min="0" step="0.25" style="width:68px">
+        </div>
+        <div class="add-row-field">
+          <label>Rate/hr</label>
+          <div class="input-prefix" style="width:88px;height:30px">
+            <span>$</span>
+            <input type="number" id="laborRate_${sid}" value="150" min="0" step="1" style="text-align:right">
+          </div>
+        </div>
+        <button class="add-btn" onclick="addLabor(${sid})"><i class="ti ti-plus" aria-hidden="true"></i> Add</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── render table bodies ── */
+function renderMaterials(sid){
+  const tbody=document.getElementById('matBody_'+sid);if(!tbody)return;
+  const p=getPic(sid);
+  if(!p||!p.matItems.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No materials added yet</td></tr>';return;}
+  tbody.innerHTML=p.matItems.map(item=>{
+    const total=item.qty*item.unit*(1+item.markup/100);
+    return `<tr>
+      <td><input type="text" value="${escHtml(item.name)}" onchange="updateMaterial(${sid},${item.id},'name',this.value)"></td>
+      <td><input type="number" value="${item.qty}" min="1" step="1" onchange="updateMaterial(${sid},${item.id},'qty',this.value)" style="text-align:right"></td>
+      <td><div class="input-prefix" style="height:29px"><span>$</span><input type="number" value="${item.unit}" min="0" step="0.01" onchange="updateMaterial(${sid},${item.id},'unit',this.value)" style="text-align:right"></div></td>
+      <td><input type="number" value="${item.markup}" min="0" step="1" onchange="updateMaterial(${sid},${item.id},'markup',this.value)" style="text-align:right"></td>
+      <td><div class="line-total">${fmtMoney(total)}</div></td>
+      <td><button class="del-btn" onclick="delMaterial(${sid},${item.id})"><i class="ti ti-trash" style="font-size:14px"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderLabor(sid){
+  const tbody=document.getElementById('laborBody_'+sid);if(!tbody)return;
+  const p=getPic(sid);
+  if(!p||!p.laborItems.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No labor added yet</td></tr>';return;}
+  tbody.innerHTML=p.laborItems.map(item=>{
+    const total=item.techs*item.hours*item.rate;
+    const ro=item.type==='drive'?'readonly':'';
+    return `<tr>
+      <td><input type="text" value="${escHtml(item.desc)}" onchange="updateLabor(${sid},${item.id},'desc',this.value)"></td>
+      <td><input type="number" value="${item.techs}" min="1" step="1" onchange="updateLabor(${sid},${item.id},'techs',this.value);renderLabor(${sid})" style="text-align:right"></td>
+      <td><input type="number" value="${item.hours}" min="0" step="0.25" onchange="updateLabor(${sid},${item.id},'hours',this.value)" style="text-align:right" ${ro}></td>
+      <td><div class="input-prefix" style="height:29px"><span>$</span><input type="number" value="${item.rate}" min="0" step="1" onchange="updateLabor(${sid},${item.id},'rate',this.value)" style="text-align:right" ${ro}></div></td>
+      <td><div class="line-total">${fmtMoney(total)}</div></td>
+      <td><button class="del-btn" onclick="delLabor(${sid},${item.id})"><i class="ti ti-trash" style="font-size:14px"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── materials CRUD ── */
+function addMaterial(sid){
+  const p=getPic(sid);if(!p)return;
+  const name=document.getElementById('matSearch_'+sid).value.trim();
+  if(!name){document.getElementById('matSearch_'+sid).focus();return;}
+  const qty=parseFloat(document.getElementById('matQty_'+sid).value)||1;
+  const unit=parseFloat(document.getElementById('matUnit_'+sid).value)||0;
+  const markup=parseFloat(document.getElementById('matMarkup_'+sid).value)||0;
+  p.matItems.push({id:Date.now(),name,qty,unit,markup});
+  document.getElementById('matSearch_'+sid).value='';
+  document.getElementById('matUnit_'+sid).value='';
+  document.getElementById('matQty_'+sid).value='1';
+  sugEl.style.display='none';
+  renderMaterials(sid);recalcTotals();scheduleSave();
+}
+function delMaterial(sid,id){const p=getPic(sid);if(!p)return;p.matItems=p.matItems.filter(i=>i.id!==id);renderMaterials(sid);recalcTotals();scheduleSave();}
+function updateMaterial(sid,id,field,val){
+  const p=getPic(sid);if(!p)return;
+  const item=p.matItems.find(i=>i.id===id);
+  if(item){item[field]=field==='name'?val:(parseFloat(val)||0);recalcTotals();scheduleSave();}
+}
+
+/* ── labor CRUD ── */
+function laborTypeChange(sid){
+  const t=document.getElementById('laborType_'+sid).value;
+  document.getElementById('laborDescField_'+sid).style.display=t==='custom'?'flex':'none';
+  const h=document.getElementById('laborHours_'+sid);
+  if(t==='drive'){h.value=globalDriveHoursVal;h.readOnly=true;h.style.background='var(--card2)';}
+  else{h.readOnly=false;h.style.background='';}
+}
+function addLabor(sid){
+  const p=getPic(sid);if(!p)return;
+  const t=document.getElementById('laborType_'+sid).value;
+  const techs=parseFloat(document.getElementById('laborTechs_'+sid).value)||1;
+  const hours=parseFloat(document.getElementById('laborHours_'+sid).value)||0;
+  const rate=parseFloat(document.getElementById('laborRate_'+sid).value)||150;
+  let desc='';
+  if(t==='tech') desc=`${techs} Tech${techs>1?'s':''}, ${hours} ${hours===1?'Hour':'Hours'}`;
+  else if(t==='drive') desc=`Drive Time, ${hours} ${hours===1?'Hour':'Hours'}`;
+  else desc=document.getElementById('laborDesc_'+sid).value.trim()||'Custom Labor';
+  p.laborItems.push({id:Date.now(),desc,techs,hours,rate,type:t});
+  document.getElementById('laborTechs_'+sid).value='1';
+  document.getElementById('laborHours_'+sid).value='1';
+  document.getElementById('laborRate_'+sid).value='150';
+  document.getElementById('laborDesc_'+sid).value='';
+  document.getElementById('laborType_'+sid).value='tech';
+  laborTypeChange(sid);
+  renderLabor(sid);recalcTotals();scheduleSave();
+}
+function delLabor(sid,id){const p=getPic(sid);if(!p)return;p.laborItems=p.laborItems.filter(i=>i.id!==id);renderLabor(sid);recalcTotals();scheduleSave();}
+function updateLabor(sid,id,field,val){
+  const p=getPic(sid);if(!p)return;
+  const item=p.laborItems.find(i=>i.id===id);
+  if(!item)return;
+  item[field]=field==='desc'?val:(parseFloat(val)||0);
+  recalcTotals();scheduleSave();
+}
+
+/* ── global actions ── */
+function applyGlobalMarkup(){
+  const m=gMarkup();
+  pictures.forEach(p=>{
+    p.matItems.forEach(i=>i.markup=m);
+    renderMaterials(p.id);
+    const el=document.getElementById('matMarkup_'+p.id);if(el)el.value=m;
+  });
+  recalcTotals();scheduleSave();
+}
+function updateDriveTimeItems(){
+  const h=globalDriveHoursVal;
+  pictures.forEach(p=>{
+    p.laborItems.filter(i=>i.type==='drive').forEach(i=>i.hours=h);
+    renderLabor(p.id);
+  });
+  recalcTotals();scheduleSave();
+}
+
+/* ── totals ── */
+function recalcTotals(){
+  let totalMatCost=0,totalMatBilled=0,totalLabor=0;
+  pictures.forEach(p=>{
+    let mc=0,mb=0,lt=0;
+    p.matItems.forEach(i=>{const c=i.qty*i.unit;mc+=c;mb+=c*(1+i.markup/100);});
+    p.laborItems.forEach(i=>{lt+=i.techs*i.hours*i.rate;});
+    const el=document.getElementById('matSubtotal_'+p.id);if(el)el.textContent=fmtMoney(mb);
+    const le=document.getElementById('laborSubtotal_'+p.id);if(le)le.textContent=fmtMoney(lt);
+    totalMatCost+=mc;totalMatBilled+=mb;totalLabor+=lt;
+  });
+  const grand=totalMatBilled+totalLabor;
+  const margin=grand>0?((grand-totalMatCost)/grand*100):0;
+  document.getElementById('t_matCost').textContent=fmtMoney(totalMatCost);
+  document.getElementById('t_matBilled').textContent=fmtMoney(totalMatBilled);
+  document.getElementById('t_labor').textContent=fmtMoney(totalLabor);
+  document.getElementById('t_grand').textContent=fmtMoney(grand);
+  document.getElementById('t_margin').textContent=margin.toFixed(1)+'% overall margin';
+}
+
+/* ── suggestions ── */
+function positionSuggestions(){
+  if(!activeSearchEl)return;
+  const r=activeSearchEl.getBoundingClientRect();
+  sugEl.style.left=r.left+'px';
+  sugEl.style.top=(r.bottom+4)+'px';
+  sugEl.style.width=Math.max(r.width,280)+'px';
+}
+function showSuggestions(e,sid){
+  activeSearchEl=e.target;
+  const q=e.target.value.trim().toLowerCase();
+  if(q.length<1){sugEl.style.display='none';return;}
+  const matches=CATALOG.filter(i=>i.name.toLowerCase().includes(q)).slice(0,12);
+  if(!matches.length){sugEl.style.display='none';return;}
+  sugEl.innerHTML=matches.map((m,i)=>`<div class="suggestion-item" data-i="${i}" onmousedown="pickSuggestion(this,${sid})">${escHtml(m.name)}<small>${escHtml(m.cat)}</small></div>`).join('');
+  sugEl.querySelectorAll('.suggestion-item').forEach((el,i)=>el._name=matches[i].name);
+  sugEl.style.display='block';positionSuggestions();sugIdx=-1;
+}
+function pickSuggestion(el,sid){
+  document.getElementById('matSearch_'+sid).value=el._name;
+  sugEl.style.display='none';
+  document.getElementById('matUnit_'+sid).focus();
+}
+function scheduleDismiss(){dismissTimer=setTimeout(()=>{sugEl.style.display='none';},200);}
+function searchKey(e,sid){
+  const items=sugEl.querySelectorAll('.suggestion-item');if(!items.length)return;
+  if(e.key==='ArrowDown'){e.preventDefault();sugIdx=Math.min(sugIdx+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('active',i===sugIdx));}
+  else if(e.key==='ArrowUp'){e.preventDefault();sugIdx=Math.max(sugIdx-1,0);items.forEach((el,i)=>el.classList.toggle('active',i===sugIdx));}
+  else if(e.key==='Enter'&&sugIdx>=0){e.preventDefault();items[sugIdx].dispatchEvent(new MouseEvent('mousedown'));}
+  else if(e.key==='Escape'){sugEl.style.display='none';}
+}
+window.addEventListener('scroll',()=>{if(sugEl.style.display!=='none')positionSuggestions();},true);
+window.addEventListener('resize',()=>{if(sugEl.style.display!=='none')positionSuggestions();});
+
+/* ── output ── */
+// Dead-simple Word-safe table. No MSO hacks. Just bgcolor + font tags.
+// Word has understood these since 1997 and will never override them.
+
+// Word-safe cell builder — bgcolor + font attributes, black border on every cell
+function cell(content, colspan, align, bold, bg, color){
+  const cp = colspan > 1 ? ` colspan="${colspan}"` : '';
+  const al = align === 'right' ? ' align="right"' : '';
+  const border = 'border:1px solid #ffffff;';
+  const pad = 'padding:5px 8px;';
+  const inner = bold
+    ? `<b><font face="Times New Roman" color="${color}">${content}</font></b>`
+    : `<font face="Times New Roman" color="${color}">${content}</font>`;
+  return `<td${cp}${al} bgcolor="${bg}" style="${border}${pad}">${inner}</td>`;
+}
+
+function buildRows(){
+  const O  = '#d76600'; // brand orange — all rows
+  const W  = '#ffffff'; // white text
+  const BD = '#ffffff'; // white borders
+  let rows = '';
+  let totalBilled = 0, totalLabor = 0;
+
+  pictures.forEach((p, idx) => {
+    let mb = 0, lt = 0;
+    p.matItems.forEach(i  => { mb += i.qty * i.unit * (1 + i.markup / 100); });
+    p.laborItems.forEach(i => { lt += i.techs * i.hours * i.rate; });
+    totalBilled += mb; totalLabor += lt;
+
+    const picName = escHtml(p.name || 'Picture ' + (idx + 1));
+
+    // ── Picture name — full-width header row, larger text ──
+    rows += `<tr><td colspan="5" bgcolor="${O}" style="border:1px solid ${BD};padding:7px 10px;">
+      <b><font face="Times New Roman" color="${W}" size="3">${picName}</font></b>
+    </td></tr>`;
+
+    // ── Materials ──
+    if (p.matItems.length) {
+      // Section label
+      rows += `<tr><td colspan="5" bgcolor="${O}" style="border:1px solid ${BD};padding:4px 10px;padding-left:18px;">
+        <b><font face="Times New Roman" color="${W}">Materials Required</font></b>
+      </td></tr>`;
+      // Column headers — underlined to distinguish from data
+      rows += `<tr>
+        ${cell('<u>Qty</u>',  1,'left', true,O,W)}
+        ${cell('<u>Material</u>',2,'left', true,O,W)}
+        ${cell('<u>Cost</u>',    1,'right',true,O,W)}
+        ${cell('<u>Billed</u>',  1,'right',true,O,W)}
+      </tr>`;
+      p.matItems.forEach(i => {
+        rows += `<tr>
+          ${cell(escHtml(String(i.qty)),                              1,'left', false,O,W)}
+          ${cell(escHtml(i.name),                                     2,'left', false,O,W)}
+          ${cell(escHtml(fmtMoney(i.qty*i.unit)),                     1,'right',false,O,W)}
+          ${cell(escHtml(fmtMoney(i.qty*i.unit*(1+i.markup/100))),    1,'right',false,O,W)}
+        </tr>`;
+      });
+    }
+
+    // ── Labor ──
+    if (p.laborItems.length) {
+      rows += `<tr><td colspan="5" bgcolor="${O}" style="border:1px solid ${BD};padding:4px 10px;padding-left:18px;">
+        <b><font face="Times New Roman" color="${W}">Labor Required</font></b>
+      </td></tr>`;
+      rows += `<tr>
+        ${cell('<u>Description</u>',3,'left', true,O,W)}
+        ${cell('<u>Rate/hr</u>',    1,'right',true,O,W)}
+        ${cell('<u>Total</u>',      1,'right',true,O,W)}
+      </tr>`;
+      p.laborItems.forEach(i => {
+        rows += `<tr>
+          ${cell(escHtml(i.desc),                              3,'left', false,O,W)}
+          ${cell(escHtml('$'+i.rate+'/hr'),                    1,'right',false,O,W)}
+          ${cell(escHtml(fmtMoney(i.techs*i.hours*i.rate)),   1,'right',false,O,W)}
+        </tr>`;
+      });
+    }
+
+    // ── Picture Total ──
+    rows += `<tr>
+      <td colspan="4" bgcolor="${O}" style="border:1px solid ${BD};padding:5px 10px;">
+        <b><font face="Times New Roman" color="${W}">Picture Total</font></b>
+      </td>
+      <td align="right" bgcolor="${O}" style="border:1px solid ${BD};padding:5px 10px;">
+        <b><font face="Times New Roman" color="${W}">${escHtml(fmtMoney(mb+lt))}</font></b>
+      </td>
+    </tr>`;
+  });
+
+  // ── Grand Total ──
+  const grand = totalBilled + totalLabor;
+  rows += `<tr>
+    <td colspan="4" bgcolor="${O}" style="border:1px solid ${BD};padding:7px 10px;">
+      <b><font face="Times New Roman" color="${W}" size="3">Grand Total</font></b>
+    </td>
+    <td align="right" bgcolor="${O}" style="border:1px solid ${BD};padding:7px 10px;">
+      <b><font face="Times New Roman" color="${W}" size="3">${escHtml(fmtMoney(grand))}</font></b>
+    </td>
+  </tr>`;
+
+  // ── Disclaimer ──
+  rows += `<tr><td colspan="5" bgcolor="${O}" style="border:1px solid ${BD};padding:5px 10px;">
+    <font face="Times New Roman" color="${W}">All Servicing &amp; Repairs are Done to NETA/NEC Specifications &amp; Standards.</font>
+  </td></tr>`;
+
+  return rows;
+}
+
+function buildTable(){
+  return `<table border="1" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:collapse;border:1px solid #ffffff;">${buildRows()}</table>`;
+}
+
+function generateOutput(){
+  const qName = document.getElementById('quoteName').value || 'Quote';
+  const client = document.getElementById('clientName').value;
+  const title = `<p style="font-family:'Times New Roman',serif;font-size:14pt;font-weight:bold;margin:0 0 10px;">${escHtml(qName)}${client ? ' &mdash; ' + escHtml(client) : ''}</p>`;
+  document.getElementById('outputDiv').innerHTML = title + buildTable();
+  document.getElementById('outputModal').classList.add('show');
+  copyOutput();
+}
+
+function copyOutput(){
+  const qName = document.getElementById('quoteName').value || 'Quote';
+  const client = document.getElementById('clientName').value;
+  const title = `<p style="font-family:'Times New Roman',serif;font-size:14pt;font-weight:bold;margin:0 0 10px;">${escHtml(qName)}${client ? ' &mdash; ' + escHtml(client) : ''}</p>`;
+  const wordHTML = `<html><head><meta charset="utf-8"></head><body>${title}${buildTable()}</body></html>`;
+  const blob = new Blob([wordHTML], {type: 'text/html'});
+  navigator.clipboard.write([new ClipboardItem({'text/html': blob})]).then(() => {
+    const c = document.getElementById('copyConfirm'); c.classList.add('show'); setTimeout(() => c.classList.remove('show'), 2500);
+  }).catch(() => {
+    const sel = window.getSelection(); const range = document.createRange();
+    range.selectNodeContents(document.getElementById('outputDiv'));
+    sel.removeAllRanges(); sel.addRange(range); document.execCommand('copy'); sel.removeAllRanges();
+    const c = document.getElementById('copyConfirm'); c.classList.add('show'); setTimeout(() => c.classList.remove('show'), 2500);
+  });
+}
+
+function clearAll(){
+  if(!confirm('Clear everything and start a new job?'))return;
+  pictures=[];activeId=null;
+  document.getElementById('quoteName').value='';
+  document.getElementById('clientName').value='';
+  document.getElementById('outputModal').classList.remove('show');
+  try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
+  addPicture();recalcTotals();
+}
+
+/* ── init ── */
+loadState();
+if(!pictures.length) addPicture();
+else{renderTabBar();renderActivePanel();}
+recalcTotals();
+</script>
+</body>
+</html>
