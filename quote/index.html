@@ -25,7 +25,7 @@
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
-    .app{padding:2rem 1rem 1rem;max-width:900px;margin:0 auto}
+    .app{padding:2rem 1rem 5rem;max-width:900px;margin:0 auto}
 
     /* ── header ── */
     .header{margin-bottom:1.25rem}
@@ -43,7 +43,8 @@
     .field-group input:focus{outline:none;border-color:var(--focus)}
     /* settings row — drive time + markup */
     .job-settings{border-top:1px solid var(--border);padding-top:.75rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:13px;color:var(--txt2)}
-    .setting-group{display:flex;align-items:center;gap:.4rem}
+    .setting-group{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+    .setting-group span{white-space:nowrap}
     .setting-group input{height:28px;width:56px;padding:0 6px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:13px;text-align:right}
     .setting-group input:focus{outline:none;border-color:var(--focus)}
     .setting-group button{height:28px;padding:0 10px;border:1px solid var(--border2);border-radius:var(--radius-md);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;white-space:nowrap}
@@ -71,8 +72,8 @@
 
     /* ── picture content panel ── */
     .picture-panel{background:var(--card);border:1px solid var(--border);border-radius:0 0 var(--radius-lg) var(--radius-lg);margin-bottom:1rem}
-    .picture-header{padding:.875rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem}
-    .picture-name-input{flex:1;height:36px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:14px;font-weight:500}
+    .picture-header{padding:.875rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;background:var(--card2);border-radius:0}
+    .picture-name-input{width:100%;height:30px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);color:var(--txt);font-size:13px}
     .picture-name-input:focus{outline:none;border-color:var(--focus)}
     .picture-name-input::placeholder{color:var(--txt3);font-weight:400}
     .pic-del-btn{height:32px;padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:transparent;color:var(--txt3);font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0}
@@ -151,6 +152,33 @@
     .action-btn:hover{background:var(--card2)}
     .action-btn.primary{background:#1a1f2e;color:#ffffff;border-color:#1a1f2e}
     .action-btn.primary:hover{background:#2d3449}
+    .action-btn.danger{color:var(--danger);border-color:transparent;background:transparent;font-size:12px;opacity:.7}
+    .action-btn.danger:hover{background:var(--dangerbg);border-color:var(--danger);opacity:1}
+    /* ── sticky copy button ── */
+    .sticky-copy{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:.625rem 1rem;display:flex;justify-content:center;z-index:200;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+    .sticky-copy button{height:42px;padding:0 32px;border:none;border-radius:var(--radius-md);background:#d76600;color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;width:100%;max-width:420px;justify-content:center}
+    .sticky-copy button:hover{background:#b85500}
+    /* ── drive-zero warning ── */
+    .drive-zero-warn{color:#d76600;font-size:11px;margin-left:2px;position:relative;cursor:default}
+    .drive-zero-warn::after{
+      content:'Drive time is 0 — will not appear in quote output.';
+      position:absolute;
+      bottom:calc(100% + 6px);
+      left:50%;
+      transform:translateX(-50%);
+      background:#1a1a1a;
+      color:#fff;
+      font-size:11px;
+      font-family:inherit;
+      white-space:nowrap;
+      padding:5px 9px;
+      border-radius:5px;
+      pointer-events:none;
+      opacity:0;
+      transition:opacity .1s;
+      z-index:999;
+    }
+    .drive-zero-warn:hover::after{opacity:1}
 
     /* ── output ── */
     .output-modal{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
@@ -178,6 +206,10 @@
       .picture-header{flex-wrap:wrap;gap:.5rem}
       .picture-name-input{min-width:0}
       .tab-bar-wrap{padding:0 .5rem}
+      /* hide low-priority columns so table fits without scrolling */
+      .col-mobile-hide{display:none}
+      .items-table th,.items-table td{padding:4px 4px}
+      .items-table input,.items-table select{padding:0 4px;font-size:12px}
     }
   </style>
 </head>
@@ -195,6 +227,10 @@
   </div>
 
   <div class="job-meta">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+      <span style="font-size:12px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em">Job Details</span>
+      <button onclick="clearAll()" style="background:none;border:none;color:var(--txt3);font-size:12px;cursor:pointer;padding:2px 4px;border-radius:4px;display:flex;align-items:center;gap:4px" onmouseover="this.style.color='var(--danger)'" onmouseout="this.style.color='var(--txt3)'"><i class="ti ti-trash" aria-hidden="true"></i> Clear all</button>
+    </div>
     <div class="job-meta-fields">
       <div class="field-group">
         <label>Job name</label>
@@ -209,9 +245,9 @@
       <div class="setting-group">
         <i class="ti ti-car" aria-hidden="true"></i>
         <span>Drive time</span>
-        <input type="number" id="globalDriveHours" value="2" min="0" step="0.25" onchange="setGlobalDriveHours(this.value)">
+        <input type="number" id="globalDriveHours" value="0" min="0" step="0.25" onchange="onDriveTimeChange()">
         <span>hrs</span>
-        <button onclick="applyGlobalDriveTime()">Apply to all pictures</button>
+        <span class="drive-zero-warn" id="driveZeroWarn"><i class="ti ti-alert-triangle" aria-hidden="true"></i></span>
       </div>
       <div class="gb-divider"></div>
       <div class="setting-group">
@@ -256,10 +292,6 @@
     </div>
   </div>
 
-  <div class="actions">
-    <button class="action-btn primary" onclick="generateOutput()"><i class="ti ti-copy" aria-hidden="true"></i> Copy formatted quote</button>
-    <button class="action-btn" onclick="clearAll()"><i class="ti ti-trash" aria-hidden="true"></i> Clear all</button>
-  </div>
 
   <div class="output-modal" id="outputModal">
     <div style="display:flex;align-items:center;justify-content:space-between">
@@ -270,8 +302,12 @@
     <div class="copy-confirm" id="copyConfirm"><i class="ti ti-check" aria-hidden="true"></i> Copied to clipboard — paste directly into Word</div>
   </div>
 
+  <div class="sticky-copy">
+    <button onclick="generateOutput()"><i class="ti ti-copy" aria-hidden="true"></i> Copy formatted quote</button>
+  </div>
+
   <div class="page-footer">
-    Built for internal use for <strong>SITesting</strong> &nbsp;·&nbsp; <a href="https://jwalkerjohnson.com" target="_blank">jwalkerjohnson.com</a>
+    Built for internal use for <strong>SI Testing</strong> &nbsp;·&nbsp; <a href="https://jwalkerjohnson.com" target="_blank">jwalkerjohnson.com</a>
   </div>
 
 </div>
@@ -300,7 +336,7 @@ const CATALOG=[
 const STORAGE_KEY='eq_draft_v3';
 let pictures=[];   // [{id, name, matItems, laborItems}]
 let activeId=null;
-let globalMarkupVal=45,globalDriveHoursVal=2;
+let globalMarkupVal=45;
 let sugIdx=-1,dismissTimer=null,saveTimer=null,activeSearchEl=null;
 const sugEl=document.getElementById('suggestions');
 
@@ -311,16 +347,12 @@ function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function getPic(id){return pictures.find(p=>p.id===id);}
 function gMarkup(){return globalMarkupVal;}
 function setGlobalMarkup(v){globalMarkupVal=parseFloat(v)||0;scheduleSave();}
-function setGlobalDriveHours(v){
-  globalDriveHoursVal=parseFloat(v)||0;
-  // Keep hint + locked hours input in sync for the active picture
-  if(activeId){
-    const hint=document.getElementById('driveHint_'+activeId);
-    if(hint&&hint.style.display!=='none') hint.textContent='Global: '+globalDriveHoursVal+' hrs';
-    const t=document.getElementById('laborType_'+activeId);
-    if(t&&t.value==='drive'){const h=document.getElementById('laborHours_'+activeId);if(h)h.value=globalDriveHoursVal;}
-  }
+function onDriveTimeChange(){
+  recalcTotals();
   scheduleSave();
+  const v=parseFloat(document.getElementById('globalDriveHours').value)||0;
+  const warn=document.getElementById('driveZeroWarn');
+  if(warn)warn.style.display=v===0?'inline':'none';
 }
 function tabLabel(p,idx){
   const name=p.name.trim();
@@ -334,7 +366,7 @@ function saveState(){
     quoteName:document.getElementById('quoteName').value,
     clientName:document.getElementById('clientName').value,
     globalMarkup:globalMarkupVal,
-    globalDriveHours:globalDriveHoursVal,
+    globalDriveHours:document.getElementById('globalDriveHours').value,
     pictures,activeId
   };
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
@@ -350,7 +382,7 @@ function loadState(){
   if(state.quoteName) document.getElementById('quoteName').value=state.quoteName;
   if(state.clientName) document.getElementById('clientName').value=state.clientName;
   if(state.globalMarkup!=null){globalMarkupVal=parseFloat(state.globalMarkup)||45;const el=document.getElementById('globalMarkup');if(el)el.value=globalMarkupVal;}
-  if(state.globalDriveHours!=null){globalDriveHoursVal=parseFloat(state.globalDriveHours)||2;const el=document.getElementById('globalDriveHours');if(el)el.value=globalDriveHoursVal;}
+  if(state.globalDriveHours!=null){const el=document.getElementById('globalDriveHours');if(el)el.value=parseFloat(state.globalDriveHours)||0;}
   if(Array.isArray(state.pictures)&&state.pictures.length){
     pictures=state.pictures;
     activeId=state.activeId&&pictures.find(p=>p.id===state.activeId)?state.activeId:pictures[0].id;
@@ -368,7 +400,7 @@ function addPicture(){
   scheduleSave();
   // Focus the name input after render
   setTimeout(()=>{
-    const inp=document.getElementById('pictureName');
+    const inp=document.getElementById('pictureName_'+p.id);
     if(inp)inp.focus();
   },50);
 }
@@ -390,8 +422,8 @@ function switchTab(id){
   renderActivePanel();
   scheduleSave();
 }
-function updatePictureName(val){
-  const p=getPic(activeId);if(!p)return;
+function updatePictureName(sid, val){
+  const p=getPic(sid);if(!p)return;
   p.name=val;
   // Update just the tab label without full re-render
   const idx=pictures.findIndex(p=>p.id===activeId);
@@ -419,10 +451,13 @@ function renderActivePanel(){
   if(!p){panel.innerHTML='';return;}
   panel.innerHTML=`
     <div class="picture-header">
-      <input type="text" id="pictureName" class="picture-name-input"
-        value="${escHtml(p.name)}"
-        placeholder="e.g. (1st Floor, Main Electrical Room, Panel LD) Replace Mismatched Breakers"
-        oninput="updatePictureName(this.value)">
+      <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+        <label style="font-size:11px;color:var(--txt2);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Picture name / description</label>
+        <input type="text" id="pictureName_${p.id}" class="picture-name-input"
+          value="${escHtml(p.name)}"
+          placeholder="e.g. (1st Floor, Main Electrical Room, Panel LD) Replace Mismatched Breakers"
+          oninput="updatePictureName(${p.id}, this.value)">
+      </div>
       <button class="pic-del-btn" onclick="deletePicture(${p.id})">
         <i class="ti ti-trash" aria-hidden="true"></i> Delete picture
       </button>
@@ -442,19 +477,17 @@ function materialsCardHTML(p){
       <h3><i class="ti ti-package" aria-hidden="true"></i> Materials</h3>
       <div class="section-subtotal">Subtotal: <span id="matSubtotal_${sid}">$0.00</span></div>
     </div>
-    <div class="table-wrap">
     <table class="items-table">
       <thead><tr>
-        <th style="min-width:160px">Item</th>
-        <th style="width:55px">Qty</th>
-        <th style="width:108px">Unit price</th>
-        <th style="width:62px">Markup %</th>
-        <th style="width:96px">Line total</th>
-        <th style="width:32px"></th>
+        <th style="min-width:120px">Item</th>
+        <th style="width:48px">Qty</th>
+        <th style="width:100px">Unit price</th>
+        <th class="col-mobile-hide" style="width:62px">Markup %</th>
+        <th style="width:88px">Line total</th>
+        <th style="width:28px"></th>
       </tr></thead>
       <tbody id="matBody_${sid}"></tbody>
     </table>
-    </div>
     <div class="add-row">
       <div class="add-row-inner">
         <div class="add-row-field" style="flex:2;min-width:180px">
@@ -491,27 +524,24 @@ function laborCardHTML(p){
       <h3><i class="ti ti-tool" aria-hidden="true"></i> Labor</h3>
       <div class="section-subtotal">Subtotal: <span id="laborSubtotal_${sid}">$0.00</span></div>
     </div>
-    <div class="table-wrap">
     <table class="items-table">
       <thead><tr>
-        <th style="min-width:160px">Description</th>
-        <th style="width:55px">Techs</th>
-        <th style="width:72px">Hours</th>
-        <th style="width:108px">Rate/hr</th>
-        <th style="width:96px">Line total</th>
-        <th style="width:32px"></th>
+        <th style="min-width:120px">Description</th>
+        <th class="col-mobile-hide" style="width:50px">Techs</th>
+        <th style="width:60px">Hours</th>
+        <th style="width:96px">Rate/hr</th>
+        <th style="width:88px">Line total</th>
+        <th style="width:28px"></th>
       </tr></thead>
       <tbody id="laborBody_${sid}"></tbody>
     </table>
-    </div>
     <div class="add-row">
       <div class="add-row-inner">
         <div class="add-row-field">
           <label>Type</label>
           <select id="laborType_${sid}" onchange="laborTypeChange(${sid})" style="width:115px">
             <option value="tech">Tech</option>
-            <option value="drive">Drive time</option>
-            <option value="custom">Custom</option>
+            <option value="custom">Other</option>
           </select>
         </div>
         <div class="add-row-field" id="laborDescField_${sid}" style="display:none;flex:1;min-width:130px">
@@ -525,13 +555,12 @@ function laborCardHTML(p){
         <div class="add-row-field">
           <label>Hours</label>
           <input type="number" id="laborHours_${sid}" value="1" min="0" step="0.25" style="width:68px">
-          <span class="global-hint" id="driveHint_${sid}">Global: ${globalDriveHoursVal} hrs</span>
         </div>
         <div class="add-row-field">
           <label>Rate/hr</label>
           <div class="input-prefix" style="width:88px;height:30px">
             <span>$</span>
-            <input type="number" id="laborRate_${sid}" value="150" min="0" step="1" style="text-align:right">
+            <input type="number" id="laborRate_${sid}" value="50" min="0" step="1" style="text-align:right">
           </div>
         </div>
         <button class="add-btn" onclick="addLabor(${sid})"><i class="ti ti-plus" aria-hidden="true"></i> Add</button>
@@ -551,7 +580,7 @@ function renderMaterials(sid){
       <td><input type="text" value="${escHtml(item.name)}" onchange="updateMaterial(${sid},${item.id},'name',this.value)"></td>
       <td><input type="number" value="${item.qty}" min="1" step="1" onchange="updateMaterial(${sid},${item.id},'qty',this.value)" style="text-align:right"></td>
       <td><div class="input-prefix" style="height:29px"><span>$</span><input type="number" value="${item.unit}" min="0" step="0.01" onchange="updateMaterial(${sid},${item.id},'unit',this.value)" style="text-align:right"></div></td>
-      <td><input type="number" value="${item.markup}" min="0" step="1" onchange="updateMaterial(${sid},${item.id},'markup',this.value)" style="text-align:right"></td>
+      <td class="col-mobile-hide"><input type="number" value="${item.markup}" min="0" step="1" onchange="updateMaterial(${sid},${item.id},'markup',this.value)" style="text-align:right"></td>
       <td><div class="line-total">${fmtMoney(total)}</div></td>
       <td><button class="del-btn" onclick="delMaterial(${sid},${item.id})"><i class="ti ti-trash" style="font-size:14px"></i></button></td>
     </tr>`;
@@ -564,10 +593,10 @@ function renderLabor(sid){
   if(!p||!p.laborItems.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No labor added yet</td></tr>';return;}
   tbody.innerHTML=p.laborItems.map(item=>{
     const total=roundUp5(item.techs*item.hours*item.rate);
-    const ro=item.type==='drive'?'readonly':'';
+    const ro='';
     return `<tr>
       <td><input type="text" value="${escHtml(item.desc)}" onchange="updateLabor(${sid},${item.id},'desc',this.value)"></td>
-      <td><input type="number" value="${item.techs}" min="1" step="1" onchange="updateLabor(${sid},${item.id},'techs',this.value);renderLabor(${sid})" style="text-align:right"></td>
+      <td class="col-mobile-hide"><input type="number" value="${item.techs}" min="1" step="1" onchange="updateLabor(${sid},${item.id},'techs',this.value);renderLabor(${sid})" style="text-align:right"></td>
       <td><input type="number" value="${item.hours}" min="0" step="0.25" onchange="updateLabor(${sid},${item.id},'hours',this.value)" style="text-align:right" ${ro}></td>
       <td><div class="input-prefix" style="height:29px"><span>$</span><input type="number" value="${item.rate}" min="0" step="1" onchange="updateLabor(${sid},${item.id},'rate',this.value)" style="text-align:right" ${ro}></div></td>
       <td><div class="line-total">${fmtMoney(total)}</div></td>
@@ -602,30 +631,20 @@ function updateMaterial(sid,id,field,val){
 function laborTypeChange(sid){
   const t=document.getElementById('laborType_'+sid).value;
   document.getElementById('laborDescField_'+sid).style.display=t==='custom'?'flex':'none';
-  const h=document.getElementById('laborHours_'+sid);
-  const hint=document.getElementById('driveHint_'+sid);
-  if(t==='drive'){
-    h.value=globalDriveHoursVal;h.readOnly=true;h.style.background='var(--card2)';
-    if(hint){hint.textContent='Global: '+globalDriveHoursVal+' hrs';hint.style.display='block';}
-  } else {
-    h.readOnly=false;h.style.background='';
-    if(hint)hint.style.display='none';
-  }
 }
 function addLabor(sid){
   const p=getPic(sid);if(!p)return;
   const t=document.getElementById('laborType_'+sid).value;
   const techs=parseFloat(document.getElementById('laborTechs_'+sid).value)||1;
   const hours=parseFloat(document.getElementById('laborHours_'+sid).value)||0;
-  const rate=parseFloat(document.getElementById('laborRate_'+sid).value)||150;
+  const rate=parseFloat(document.getElementById('laborRate_'+sid).value)||50;
   let desc='';
   if(t==='tech') desc=`${techs} Tech${techs>1?'s':''}, ${hours} ${hours===1?'Hour':'Hours'}`;
-  else if(t==='drive') desc=`Drive Time, ${hours} ${hours===1?'Hour':'Hours'}`;
   else desc=document.getElementById('laborDesc_'+sid).value.trim()||'Custom Labor';
   p.laborItems.push({id:Date.now(),desc,techs,hours,rate,type:t});
   document.getElementById('laborTechs_'+sid).value='1';
   document.getElementById('laborHours_'+sid).value='1';
-  document.getElementById('laborRate_'+sid).value='150';
+  document.getElementById('laborRate_'+sid).value='50';
   document.getElementById('laborDesc_'+sid).value='';
   document.getElementById('laborType_'+sid).value='tech';
   laborTypeChange(sid);
@@ -650,31 +669,17 @@ function applyGlobalMarkup(){
   });
   recalcTotals();scheduleSave();
 }
-function applyGlobalDriveTime(){
-  const h=globalDriveHoursVal;
-  const affected=pictures.filter(p=>p.laborItems.some(i=>i.type==='drive'&&i.hours!==h));
-  if(affected.length){
-    const n=affected.length;
-    if(!confirm(`This will overwrite drive time hours in ${n} picture${n>1?'s':''}. Continue?`)) return;
-  }
-  updateDriveTimeItems();
-}
-function updateDriveTimeItems(){
-  const h=globalDriveHoursVal;
-  pictures.forEach(p=>{
-    p.laborItems.filter(i=>i.type==='drive').forEach(i=>i.hours=h);
-    renderLabor(p.id);
-  });
-  recalcTotals();scheduleSave();
-}
 
 /* ── totals ── */
 function recalcTotals(){
+  const driveHrs=parseFloat(document.getElementById('globalDriveHours').value)||0;
+  const driveLt=driveHrs>0?roundUp5(driveHrs*150):0;
   let totalMatCost=0,totalMatBilled=0,totalLabor=0;
   pictures.forEach(p=>{
     let mc=0,mb=0,lt=0;
     p.matItems.forEach(i=>{const c=i.qty*i.unit;mc+=c;mb+=roundUp5(c*(1+i.markup/100));});
     p.laborItems.forEach(i=>{lt+=roundUp5(i.techs*i.hours*i.rate);});
+    lt+=driveLt;
     const el=document.getElementById('matSubtotal_'+p.id);if(el)el.textContent=fmtMoney(mb);
     const le=document.getElementById('laborSubtotal_'+p.id);if(le)le.textContent=fmtMoney(lt);
     totalMatCost+=mc;totalMatBilled+=mb;totalLabor+=lt;
@@ -742,6 +747,7 @@ function buildRows(){
   const O  = '#d76600'; // brand orange — all rows
   const W  = '#ffffff'; // white text
   const BD = '#ffffff'; // white borders
+  const driveHrs = parseFloat(document.getElementById('globalDriveHours').value)||0;
   let rows = '';
   let totalBilled = 0, totalLabor = 0;
 
@@ -749,6 +755,7 @@ function buildRows(){
     let mb = 0, lt = 0;
     p.matItems.forEach(i  => { mb += roundUp5(i.qty * i.unit * (1 + i.markup / 100)); });
     p.laborItems.forEach(i => { lt += roundUp5(i.techs * i.hours * i.rate); });
+    if(driveHrs > 0) lt += roundUp5(driveHrs * 150);
     totalBilled += mb; totalLabor += lt;
 
     const picName = escHtml(p.name || 'Picture ' + (idx + 1));
@@ -798,6 +805,30 @@ function buildRows(){
           ${cell(escHtml(fmtMoney(roundUp5(i.techs*i.hours*i.rate))),   1,'right',false,O,W)}
         </tr>`;
       });
+      if(driveHrs > 0){
+        const driveTotal = roundUp5(driveHrs * 150);
+        rows += `<tr>
+          ${cell('Drive Time, '+driveHrs+' '+( driveHrs===1?'Hour':'Hours'), 3,'left', false,O,W)}
+          ${cell('$150/hr',                                                   1,'right',false,O,W)}
+          ${cell(escHtml(fmtMoney(driveTotal)),                               1,'right',false,O,W)}
+        </tr>`;
+      }
+    } else if(driveHrs > 0){
+      // picture has no other labor — still show Labor section with just drive time
+      const driveTotal = roundUp5(driveHrs * 150);
+      rows += `<tr><td colspan="5" bgcolor="${O}" style="border:1px solid ${BD};padding:4px 10px;padding-left:18px;">
+        <b><font face="Times New Roman" color="${W}">Labor Required</font></b>
+      </td></tr>`;
+      rows += `<tr>
+        ${cell('<u>Description</u>',3,'left', true,O,W)}
+        ${cell('<u>Rate/hr</u>',    1,'right',true,O,W)}
+        ${cell('<u>Total</u>',      1,'right',true,O,W)}
+      </tr>`;
+      rows += `<tr>
+        ${cell('Drive Time, '+driveHrs+' '+(driveHrs===1?'Hour':'Hours'), 3,'left', false,O,W)}
+        ${cell('$150/hr',                                                  1,'right',false,O,W)}
+        ${cell(escHtml(fmtMoney(driveTotal)),                              1,'right',false,O,W)}
+      </tr>`;
     }
 
     // ── Picture Total ──
@@ -835,6 +866,10 @@ function buildTable(){
 }
 
 function generateOutput(){
+  const driveHrs = parseFloat(document.getElementById('globalDriveHours').value)||0;
+  if(driveHrs === 0){
+    if(!confirm('Drive time is set to 0 and will not be included in the output. Continue?')) return;
+  }
   const qName = document.getElementById('quoteName').value || 'Quote';
   const client = document.getElementById('clientName').value;
   const title = `<p style="font-family:'Times New Roman',serif;font-size:14pt;font-weight:bold;margin:0 0 10px;">${escHtml(qName)}${client ? ' &mdash; ' + escHtml(client) : ''}</p>`;
@@ -874,6 +909,7 @@ loadState();
 if(!pictures.length) addPicture();
 else{renderTabBar();renderActivePanel();}
 recalcTotals();
+onDriveTimeChange(); // set initial zero-warning state
 </script>
 </body>
 </html>
