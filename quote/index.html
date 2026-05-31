@@ -679,11 +679,11 @@ function recalcTotals(){
     let mc=0,mb=0,lt=0;
     p.matItems.forEach(i=>{const c=i.qty*i.unit;mc+=c;mb+=roundUp5(c*(1+i.markup/100));});
     p.laborItems.forEach(i=>{lt+=roundUp5(i.techs*i.hours*i.rate);});
-    lt+=driveLt;
     const el=document.getElementById('matSubtotal_'+p.id);if(el)el.textContent=fmtMoney(mb);
     const le=document.getElementById('laborSubtotal_'+p.id);if(le)le.textContent=fmtMoney(lt);
     totalMatCost+=mc;totalMatBilled+=mb;totalLabor+=lt;
   });
+  totalLabor+=driveLt;
   const grand=totalMatBilled+totalLabor;
   const margin=grand>0?((grand-totalMatCost)/grand*100):0;
   document.getElementById('t_matCost').textContent=fmtMoney(totalMatCost);
@@ -748,6 +748,7 @@ function buildRows(){
   const W  = '#ffffff'; // white text
   const BD = '#ffffff'; // white borders
   const driveHrs = parseFloat(document.getElementById('globalDriveHours').value)||0;
+  const driveTotal = driveHrs > 0 ? roundUp5(driveHrs * 150) : 0;
   let rows = '';
   let totalBilled = 0, totalLabor = 0;
 
@@ -755,7 +756,6 @@ function buildRows(){
     let mb = 0, lt = 0;
     p.matItems.forEach(i  => { mb += roundUp5(i.qty * i.unit * (1 + i.markup / 100)); });
     p.laborItems.forEach(i => { lt += roundUp5(i.techs * i.hours * i.rate); });
-    if(driveHrs > 0) lt += roundUp5(driveHrs * 150);
     totalBilled += mb; totalLabor += lt;
 
     const picName = escHtml(p.name || 'Picture ' + (idx + 1));
@@ -805,30 +805,6 @@ function buildRows(){
           ${cell(escHtml(fmtMoney(roundUp5(i.techs*i.hours*i.rate))),   1,'right',false,O,W)}
         </tr>`;
       });
-      if(driveHrs > 0){
-        const driveTotal = roundUp5(driveHrs * 150);
-        rows += `<tr>
-          ${cell('Drive Time, '+driveHrs+' '+( driveHrs===1?'Hour':'Hours'), 3,'left', false,O,W)}
-          ${cell('$150/hr',                                                   1,'right',false,O,W)}
-          ${cell(escHtml(fmtMoney(driveTotal)),                               1,'right',false,O,W)}
-        </tr>`;
-      }
-    } else if(driveHrs > 0){
-      // picture has no other labor — still show Labor section with just drive time
-      const driveTotal = roundUp5(driveHrs * 150);
-      rows += `<tr><td colspan="5" bgcolor="${O}" style="border:1px solid ${BD};padding:4px 10px;padding-left:18px;">
-        <b><font face="Times New Roman" color="${W}">Labor Required</font></b>
-      </td></tr>`;
-      rows += `<tr>
-        ${cell('<u>Description</u>',3,'left', true,O,W)}
-        ${cell('<u>Rate/hr</u>',    1,'right',true,O,W)}
-        ${cell('<u>Total</u>',      1,'right',true,O,W)}
-      </tr>`;
-      rows += `<tr>
-        ${cell('Drive Time, '+driveHrs+' '+(driveHrs===1?'Hour':'Hours'), 3,'left', false,O,W)}
-        ${cell('$150/hr',                                                  1,'right',false,O,W)}
-        ${cell(escHtml(fmtMoney(driveTotal)),                              1,'right',false,O,W)}
-      </tr>`;
     }
 
     // ── Picture Total ──
@@ -841,6 +817,18 @@ function buildRows(){
       </td>
     </tr>`;
   });
+
+  // ── Total Drive Time — job-level, above grand total ──
+  if(driveHrs > 0){
+    rows += `<tr><td colspan="5" bgcolor="${O}" style="border:1px solid ${BD};padding:4px 10px;">
+      <b><font face="Times New Roman" color="${W}">Total Drive Time</font></b>
+    </td></tr>`;
+    rows += `<tr>
+      ${cell(driveHrs+' '+(driveHrs===1?'Hour':'Hours')+' @ $150/hr', 4,'left', false,O,W)}
+      ${cell(escHtml(fmtMoney(driveTotal)), 1,'right',false,O,W)}
+    </tr>`;
+    totalLabor += driveTotal;
+  }
 
   // ── Grand Total ──
   const grand = totalBilled + totalLabor;
