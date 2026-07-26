@@ -62,13 +62,39 @@
     .gb-divider{width:1px;height:16px;background:var(--border)}
 
     /* ── tab bar ── */
-    .tab-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none;padding:0 1rem;display:flex;align-items:flex-end;gap:2px;overflow-x:auto;scrollbar-width:none}
+    .tab-bar-outer{position:relative;}
+    .tab-bar-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg) var(--radius-lg) 0 0;border-bottom:none;padding:0 1rem;display:flex;align-items:flex-end;gap:2px;overflow-x:auto;scrollbar-width:none;cursor:grab;}
     .tab-bar-wrap::-webkit-scrollbar{display:none}
+    .tab-bar-wrap.dragging{cursor:grabbing;user-select:none;}
+    .tab-scroll-btn{position:absolute;top:0;bottom:0;z-index:10;width:28px;border:none;cursor:pointer;display:none;align-items:center;justify-content:center;font-size:20px;color:var(--txt2);padding:0;}
+    .tab-scroll-btn:hover{color:var(--txt);}
+    .tab-scroll-btn.left{left:0;background:linear-gradient(to right,var(--card) 55%,transparent);border-radius:var(--radius-lg) 0 0 0;}
+    .tab-scroll-btn.right{right:0;background:linear-gradient(to left,var(--card) 55%,transparent);border-radius:0 var(--radius-lg) 0 0;}
+    .tab-scroll-btn.visible{display:flex;}
     .tab{height:var(--tab-h);padding:0 14px;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--txt2);font-size:13px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;flex-shrink:0;margin-bottom:-1px;border-radius:var(--radius-md) var(--radius-md) 0 0;transition:color .15s}
     .tab:hover{color:var(--txt);background:var(--card2)}
     .tab.active{color:var(--txt);font-weight:600;border-bottom:2px solid var(--txt);background:var(--card)}
     .tab-add{height:var(--tab-h);width:36px;border:none;background:transparent;color:var(--txt2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:var(--radius-md)}
     .tab-add:hover{background:var(--card2);color:var(--txt)}
+    .inv-btn{height:var(--tab-h);padding:0 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card2);color:var(--txt2);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:6px;font-weight:500;white-space:nowrap;align-self:center}
+    .inv-btn:hover,.inv-btn.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+    /* ── inventory panel ── */
+    .inv-panel{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:0 0 var(--radius-lg) var(--radius-lg);overflow:hidden}
+    .inv-header{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;border-bottom:1px solid var(--border);background:var(--card2);flex-wrap:wrap}
+    .inv-search-wrap{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card);padding:0 8px;height:30px;flex:1;max-width:280px}
+    .inv-search-wrap input{border:none;background:transparent;outline:none;font-size:13px;width:100%;color:var(--txt)}
+    .go-btn{height:24px;padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card2);color:var(--brand);font-size:12px;cursor:pointer;font-weight:500;white-space:nowrap}
+    .go-btn:hover{background:var(--brand);color:#fff;border-color:var(--brand)}
+    /* ── mat filter in header ── */
+    .mat-filter-wrap{display:flex;align-items:center;gap:4px;border:1px solid rgba(255,255,255,.4);border-radius:var(--radius-md);background:rgba(255,255,255,.15);padding:0 7px;height:26px}
+    .mat-filter-wrap input{border:none;background:transparent;outline:none;font-size:12px;width:70px;color:#fff}
+    .mat-filter-wrap input::placeholder{color:rgba(255,255,255,.55)}
+    /* sortable th */
+    .items-table th.sortable{cursor:pointer;user-select:none}
+    .items-table th.sortable:hover{color:var(--txt)}
+    .sort-arrow{opacity:.3;font-size:10px}
+    .sort-arrow.on{opacity:1}
 
     /* ── picture content panel ── */
     .picture-panel{background:var(--card);border:1px solid var(--border);border-radius:0 0 var(--radius-lg) var(--radius-lg);margin-bottom:1rem}
@@ -127,18 +153,20 @@
     .input-prefix input:focus{outline:none}
 
     /* ── grand total footer ── */
-    .grand-footer{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem}
-    .grand-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-    .total-metric{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-md);padding:.625rem .875rem}
-    .total-metric .label{font-size:11px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:3px}
-    .total-metric .value{font-size:18px;font-weight:600;color:var(--txt)}
+    .grand-footer{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1rem;overflow:hidden}
+    .grand-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:.75rem 1rem}
+    .grand-row-picture{border-bottom:1px solid var(--border);background:var(--card2)}
+    .total-metric{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-md);padding:.5rem .75rem}
+    .grand-row-picture .total-metric{background:var(--card2)}
+    .total-metric .label{font-size:10px;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:2px}
+    .total-metric .value{font-size:16px;font-weight:600;color:var(--txt)}
     .total-metric .sub{font-size:11px;color:var(--txt3);margin-top:2px}
     .total-metric.accent{background:#fff7f0;border-color:#f5c4a0}
     .total-metric.accent .label{color:#b85500}
     .total-metric.accent .value{color:#b85500}
     .total-metric.grand{background:#d76600;border-color:#d76600}
     .total-metric.grand .label{color:rgba(255,255,255,.8)}
-    .total-metric.grand .value{font-size:24px;color:#ffffff}
+    .total-metric.grand .value{font-size:20px;color:#ffffff}
     .total-metric.grand .sub{color:rgba(255,255,255,.75)}
 
     /* ── page footer ── */
@@ -179,6 +207,18 @@
       z-index:999;
     }
     .drive-zero-warn:hover::after{opacity:1}
+
+    /* ── bug report modal ── */
+    .footer-bug-btn{background:none;border:none;color:var(--txt3);font-size:12px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
+    .footer-bug-btn:hover{color:var(--danger);}
+    .bug-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:center;justify-content:center;padding:1rem;}
+    .bug-modal.open{display:flex;}
+    .bug-modal-inner{background:var(--card);border-radius:var(--radius-lg);width:min(560px,100%);max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden;}
+    .bug-modal-header{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid var(--border);}
+    .bug-modal-header span{font-size:14px;font-weight:600;color:var(--txt);}
+    .bug-modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--txt2);line-height:1;padding:2px 6px;border-radius:4px;}
+    .bug-modal-close:hover{color:var(--txt);background:var(--card2);}
+    .bug-modal iframe{width:100%;height:520px;border:none;}
 
     /* ── output ── */
     .output-modal{display:none;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
@@ -245,8 +285,13 @@
       <div class="setting-group">
         <i class="ti ti-car" aria-hidden="true"></i>
         <span>Drive time</span>
+        <input type="number" id="globalDriveTechs" value="1" min="1" step="1" onchange="onDriveTimeChange()" style="width:44px">
+        <span>techs,</span>
         <input type="number" id="globalDriveHours" value="0" min="0" step="0.25" onchange="onDriveTimeChange()">
-        <span>hrs</span>
+        <span>hrs @</span>
+        <span>$</span>
+        <input type="number" id="globalDriveRate" value="150" min="0" step="1" onchange="onDriveTimeChange()">
+        <span>/hr</span>
         <span class="drive-zero-warn" id="driveZeroWarn"><i class="ti ti-alert-triangle" aria-hidden="true"></i></span>
       </div>
       <div class="gb-divider"></div>
@@ -261,34 +306,31 @@
   </div>
 
   <!-- Tab bar -->
-  <div class="tab-bar-wrap" id="tabBar"></div>
+  <div class="tab-bar-outer" style="display:flex;align-items:stretch">
+    <button class="tab-scroll-btn left" id="tabScrollLeft" onclick="tabScrollBy(-160)">&#8249;</button>
+    <div class="tab-bar-wrap" id="tabBar" style="flex:1;min-width:0"></div>
+    <button class="tab-scroll-btn right" id="tabScrollRight" onclick="tabScrollBy(160)">&#8250;</button>
+    <button class="inv-btn" id="invBtn" onclick="toggleInventory()" title="View all materials across all pictures">
+      <i class="ti ti-layout-list" aria-hidden="true"></i> All Materials
+    </button>
+  </div>
 
   <!-- Active picture panel -->
   <div class="picture-panel" id="picturePanel"></div>
 
   <!-- Grand total footer -->
   <div class="grand-footer">
-    <div class="grand-grid">
-      <div class="total-metric">
-        <div class="label">Materials cost</div>
-        <div class="value" id="t_matCost">$0.00</div>
-        <div class="sub">Before markup</div>
-      </div>
-      <div class="total-metric accent">
-        <div class="label">Client price</div>
-        <div class="value" id="t_matBilled">$0.00</div>
-        <div class="sub">Materials after markup</div>
-      </div>
-      <div class="total-metric">
-        <div class="label">Labor total</div>
-        <div class="value" id="t_labor">$0.00</div>
-        <div class="sub">No markup on labor</div>
-      </div>
-      <div class="total-metric grand">
-        <div class="label">Grand total</div>
-        <div class="value" id="t_grand">$0.00</div>
-        <div class="sub" id="t_margin"></div>
-      </div>
+    <div class="grand-row grand-row-picture">
+      <div class="total-metric"><div class="label">Picture Labor</div><div class="value" id="p_labor">$0.00</div></div>
+      <div class="total-metric"><div class="label">Picture Mat. Cost</div><div class="value" id="p_matCost">$0.00</div></div>
+      <div class="total-metric accent"><div class="label">Picture Client Price</div><div class="value" id="p_matBilled">$0.00</div></div>
+      <div class="total-metric grand"><div class="label">Picture Total</div><div class="value" id="p_total">$0.00</div></div>
+    </div>
+    <div class="grand-row grand-row-overall">
+      <div class="total-metric"><div class="label">Overall Labor</div><div class="value" id="t_labor">$0.00</div></div>
+      <div class="total-metric"><div class="label">Overall Mat. Cost</div><div class="value" id="t_matCost">$0.00</div></div>
+      <div class="total-metric accent"><div class="label">Overall Client Price</div><div class="value" id="t_matBilled">$0.00</div></div>
+      <div class="total-metric grand"><div class="label">Grand Total</div><div class="value" id="t_grand">$0.00</div><div class="sub" id="t_margin"></div></div>
     </div>
   </div>
 
@@ -296,7 +338,6 @@
   <div class="output-modal" id="outputModal">
     <div style="display:flex;align-items:center;justify-content:space-between">
       <span style="font-size:13px;font-weight:600">Formatted output</span>
-      <button class="action-btn" onclick="copyOutput()" style="height:28px;font-size:12px"><i class="ti ti-copy" aria-hidden="true"></i> Copy</button>
     </div>
     <div id="outputDiv" style="margin-top:.75rem;overflow-x:auto"></div>
     <div class="copy-confirm" id="copyConfirm"><i class="ti ti-check" aria-hidden="true"></i> Copied to clipboard — paste directly into Word</div>
@@ -306,8 +347,18 @@
     <button onclick="generateOutput()"><i class="ti ti-copy" aria-hidden="true"></i> Copy formatted quote</button>
   </div>
 
+  <div class="bug-modal" id="bugModal">
+    <div class="bug-modal-inner">
+      <div class="bug-modal-header">
+        <span>Report a Bug</span>
+        <button class="bug-modal-close" onclick="closeBugReport()" aria-label="Close">&times;</button>
+      </div>
+      <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdrpzgtQsR_FzwmN35Otd3Q9X87x3k7dP30Vl_tFqMLYkUyYA/viewform?embedded=true" title="Report a Bug">Loading…</iframe>
+    </div>
+  </div>
+
   <div class="page-footer">
-    Built for internal use for <strong>SI Testing</strong> &nbsp;·&nbsp; <a href="https://jwalkerjohnson.com" target="_blank">jwalkerjohnson.com</a>
+    Built for internal use for <strong>SI Testing</strong> &nbsp;·&nbsp; <a href="https://jwalkerjohnson.com" target="_blank">jwalkerjohnson.com</a> &nbsp;·&nbsp; <button class="footer-bug-btn" onclick="openBugReport()">Report a bug</button>
   </div>
 
 </div>
@@ -337,14 +388,28 @@ const STORAGE_KEY='eq_draft_v3';
 let pictures=[];   // [{id, name, matItems, laborItems}]
 let activeId=null;
 let globalMarkupVal=45;
+let customCatalog=[];
+try{customCatalog=JSON.parse(localStorage.getItem(STORAGE_KEY+'_cat'))||[];}catch(e){}
+function fullCatalog(){return CATALOG.concat(customCatalog);}
 let sugIdx=-1,dismissTimer=null,saveTimer=null,activeSearchEl=null;
+const INVENTORY_ID='__inventory__';
+let invSort={col:'picName',dir:1},invSearch='';
+let matSortState={},matFilter={};
 const sugEl=document.getElementById('suggestions');
 
 /* ── utils ── */
-function fmtMoney(v){return '$'+parseFloat(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/,',');}
+function fmtMoney(v){return '$'+parseFloat(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
 function roundUp5(v){return Math.ceil(v/5)*5;}
+// NaN-safe parse: only falls back when the value can't be parsed, so a
+// deliberate 0 (e.g. a no-charge labor line) is respected, not overwritten.
+function num(v,d){const n=parseFloat(v);return Number.isFinite(n)?n:d;}
+// Monotonic ids — Date.now() collides when two items are added in the same ms,
+// which makes delete remove both rows and edits land on the wrong one.
+let _uid=Date.now();
+function newId(){return ++_uid;}
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function getPic(id){return pictures.find(p=>p.id===id);}
+function techDesc(techs,hours){return `${techs} Tech${techs>1?'s':''}, ${hours} ${hours===1?'Hour':'Hours'}`;}
 function gMarkup(){return globalMarkupVal;}
 function setGlobalMarkup(v){globalMarkupVal=parseFloat(v)||0;scheduleSave();}
 function onDriveTimeChange(){
@@ -366,7 +431,9 @@ function saveState(){
     quoteName:document.getElementById('quoteName').value,
     clientName:document.getElementById('clientName').value,
     globalMarkup:globalMarkupVal,
+    globalDriveTechs:document.getElementById('globalDriveTechs').value,
     globalDriveHours:document.getElementById('globalDriveHours').value,
+    globalDriveRate:document.getElementById('globalDriveRate').value,
     pictures,activeId
   };
   try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
@@ -382,16 +449,45 @@ function loadState(){
   if(state.quoteName) document.getElementById('quoteName').value=state.quoteName;
   if(state.clientName) document.getElementById('clientName').value=state.clientName;
   if(state.globalMarkup!=null){globalMarkupVal=parseFloat(state.globalMarkup)||45;const el=document.getElementById('globalMarkup');if(el)el.value=globalMarkupVal;}
+  if(state.globalDriveTechs!=null){const el=document.getElementById('globalDriveTechs');if(el)el.value=parseFloat(state.globalDriveTechs)||1;}
   if(state.globalDriveHours!=null){const el=document.getElementById('globalDriveHours');if(el)el.value=parseFloat(state.globalDriveHours)||0;}
+  if(state.globalDriveRate!=null){const el=document.getElementById('globalDriveRate');if(el)el.value=parseFloat(state.globalDriveRate)||150;}
   if(Array.isArray(state.pictures)&&state.pictures.length){
     pictures=state.pictures;
+    // Backfill any field an older saved draft is missing. A single undefined
+    // number propagates NaN through every sum and shows the whole job as "$NaN".
+    pictures.forEach(p=>{
+      p.name=p.name||'';
+      p.matItems=Array.isArray(p.matItems)?p.matItems:[];
+      p.laborItems=Array.isArray(p.laborItems)?p.laborItems:[];
+      p.matItems.forEach(i=>{
+        i.name=i.name||'';
+        i.qty=Math.max(1,num(i.qty,1));
+        i.unit=num(i.unit,0);
+        i.markup=num(i.markup,globalMarkupVal);
+      });
+      p.laborItems.forEach(i=>{
+        i.techs=Math.max(1,num(i.techs,1));
+        i.hours=num(i.hours,0);
+        i.rate=num(i.rate,50);
+        i.type=i.type||'tech';
+        i.desc=i.desc||techDesc(i.techs,i.hours);
+      });
+    });
     activeId=state.activeId&&pictures.find(p=>p.id===state.activeId)?state.activeId:pictures[0].id;
+    // Keep the id counter above every restored id so new rows can never collide
+    // with saved ones (which would break delete and edit targeting).
+    pictures.forEach(p=>{
+      _uid=Math.max(_uid,p.id||0);
+      p.matItems.forEach(i=>{_uid=Math.max(_uid,i.id||0);});
+      p.laborItems.forEach(i=>{_uid=Math.max(_uid,i.id||0);});
+    });
   }
 }
 
 /* ── pictures ── */
 function addPicture(){
-  const p={id:Date.now(),name:'',matItems:[],laborItems:[]};
+  const p={id:newId(),name:'',matItems:[],laborItems:[]};
   pictures.push(p);
   activeId=p.id;
   renderTabBar();
@@ -418,8 +514,10 @@ function deletePicture(id){
 }
 function switchTab(id){
   activeId=id;
+  const ib=document.getElementById('invBtn');if(ib)ib.classList.remove('active');
   renderTabBar();
   renderActivePanel();
+  recalcTotals();
   scheduleSave();
 }
 function updatePictureName(sid, val){
@@ -432,6 +530,68 @@ function updatePictureName(sid, val){
   scheduleSave();
 }
 
+/* ── inventory panel ── */
+function toggleInventory(){
+  if(activeId===INVENTORY_ID){switchTab(pictures[0]?.id||null);return;}
+  activeId=INVENTORY_ID;
+  document.getElementById('invBtn').classList.add('active');
+  renderTabBar();
+  renderActivePanel();
+  recalcTotals();
+}
+function renderInventoryPanel(){
+  const panel=document.getElementById('picturePanel');
+  let rows=[];
+  pictures.forEach((p,i)=>{
+    const picName=p.name||'Picture '+(i+1);
+    p.matItems.forEach(item=>{
+      rows.push({picName,picId:p.id,...item,total:roundUp5(item.qty*item.unit*(1+item.markup/100))});
+    });
+  });
+  const q=invSearch.toLowerCase();
+  if(q) rows=rows.filter(r=>r.name.toLowerCase().includes(q)||r.picName.toLowerCase().includes(q));
+  rows.sort((a,b)=>{
+    const av=a[invSort.col],bv=b[invSort.col];
+    return(typeof av==='string'?av.localeCompare(bv):(av-bv))*invSort.dir;
+  });
+  const iSortTh=(col,label,style='')=>`<th class="sortable" onclick="setInvSort('${col}')" style="${style}">${label} <span class="sort-arrow${invSort.col===col?' on':''}">${invSort.col===col?(invSort.dir===1?'↑':'↓'):'↕'}</span></th>`;
+  panel.innerHTML=`<div class="inv-panel">
+    <div class="inv-header">
+      <span style="font-size:14px;font-weight:600;color:var(--txt)">All Materials</span>
+      <div class="inv-search-wrap">
+        <i class="ti ti-search" style="font-size:13px;color:var(--txt3)"></i>
+        <input type="text" placeholder="Search items or pictures…" value="${escHtml(invSearch)}"
+          oninput="invSearch=this.value;renderInventoryPanel()">
+      </div>
+      <span style="font-size:12px;color:var(--txt3)">${rows.length} item${rows.length!==1?'s':''}</span>
+    </div>
+    ${rows.length?`<table class="items-table">
+      <thead><tr>
+        ${iSortTh('picName','Picture','min-width:90px')}
+        ${iSortTh('name','Item','min-width:120px')}
+        ${iSortTh('qty','Qty','width:48px')}
+        ${iSortTh('unit','Unit Price','width:96px')}
+        <th class="col-mobile-hide" style="width:62px">Markup %</th>
+        ${iSortTh('total','Line Total','width:88px')}
+        <th style="width:52px"></th>
+      </tr></thead>
+      <tbody>${rows.map(r=>`<tr>
+        <td style="font-size:12px;color:var(--txt2)">${escHtml(r.picName)}</td>
+        <td>${escHtml(r.name)}</td>
+        <td style="text-align:right">${r.qty}</td>
+        <td><div class="line-total">${fmtMoney(r.unit)}</div></td>
+        <td class="col-mobile-hide" style="text-align:right">${r.markup}%</td>
+        <td><div class="line-total">${fmtMoney(r.total)}</div></td>
+        <td><button class="go-btn" onclick="switchTab(${r.picId})">Go →</button></td>
+      </tr>`).join('')}</tbody>
+    </table>`:`<div style="padding:2.5rem;text-align:center;color:var(--txt3);font-size:13px;font-style:italic">No materials added yet</div>`}
+  </div>`;
+}
+function setInvSort(col){
+  invSort=invSort.col===col?{col,dir:invSort.dir*-1}:{col,dir:1};
+  renderInventoryPanel();
+}
+
 /* ── render tab bar ── */
 function renderTabBar(){
   const bar=document.getElementById('tabBar');
@@ -442,10 +602,25 @@ function renderTabBar(){
     </button>`;
   }).join('');
   bar.innerHTML=tabs+`<button class="tab-add" onclick="addPicture()" title="Add picture">+</button>`;
+  updateTabScrollBtns();
+}
+function tabScrollBy(dx){
+  const bar=document.getElementById('tabBar');
+  bar.scrollBy({left:dx,behavior:'smooth'});
+  setTimeout(updateTabScrollBtns,300);
+}
+function updateTabScrollBtns(){
+  const bar=document.getElementById('tabBar');
+  const l=document.getElementById('tabScrollLeft');
+  const r=document.getElementById('tabScrollRight');
+  if(!bar||!l||!r)return;
+  l.classList.toggle('visible',bar.scrollLeft>4);
+  r.classList.toggle('visible',bar.scrollLeft<bar.scrollWidth-bar.clientWidth-4);
 }
 
 /* ── render active panel ── */
 function renderActivePanel(){
+  if(activeId===INVENTORY_ID){renderInventoryPanel();return;}
   const panel=document.getElementById('picturePanel');
   const p=getPic(activeId);
   if(!p){panel.innerHTML='';return;}
@@ -475,15 +650,19 @@ function materialsCardHTML(p){
   return `<div class="inner-card">
     <div class="inner-card-header brand">
       <h3><i class="ti ti-package" aria-hidden="true"></i> Materials</h3>
+      <div class="mat-filter-wrap">
+        <i class="ti ti-search" style="font-size:11px;opacity:.7"></i>
+        <input type="text" id="matFilter_${sid}" placeholder="Filter…" oninput="setMatFilter(${sid},this.value)">
+      </div>
       <div class="section-subtotal">Subtotal: <span id="matSubtotal_${sid}">$0.00</span></div>
     </div>
     <table class="items-table">
       <thead><tr>
-        <th style="min-width:120px">Item</th>
-        <th style="width:48px">Qty</th>
-        <th style="width:100px">Unit price</th>
+        <th class="sortable" onclick="setMatSort(${sid},'name')" style="min-width:120px">Item <span class="sort-arrow" id="msort_${sid}_name">↕</span></th>
+        <th class="sortable" onclick="setMatSort(${sid},'qty')" style="width:48px">Qty <span class="sort-arrow" id="msort_${sid}_qty">↕</span></th>
+        <th class="sortable" onclick="setMatSort(${sid},'unit')" style="width:100px">Unit price <span class="sort-arrow" id="msort_${sid}_unit">↕</span></th>
         <th class="col-mobile-hide" style="width:62px">Markup %</th>
-        <th style="width:88px">Line total</th>
+        <th class="sortable" onclick="setMatSort(${sid},'total')" style="width:88px">Line total <span class="sort-arrow" id="msort_${sid}_total">↕</span></th>
         <th style="width:28px"></th>
       </tr></thead>
       <tbody id="matBody_${sid}"></tbody>
@@ -512,6 +691,7 @@ function materialsCardHTML(p){
           <input type="number" id="matMarkup_${sid}" value="${gMarkup()}" min="0" step="1" style="width:60px">
         </div>
         <button class="add-btn" onclick="addMaterial(${sid})"><i class="ti ti-plus" aria-hidden="true"></i> Add</button>
+        <button class="add-btn" onclick="saveToCatalog(${sid})" title="Save item name to catalog" style="border-color:var(--border2);color:var(--txt2);gap:3px"><i class="ti ti-bookmark" aria-hidden="true"></i> Catalog</button>
       </div>
     </div>
   </div>`;
@@ -573,19 +753,47 @@ function laborCardHTML(p){
 function renderMaterials(sid){
   const tbody=document.getElementById('matBody_'+sid);if(!tbody)return;
   const p=getPic(sid);
-  if(!p||!p.matItems.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No materials added yet</td></tr>';return;}
-  tbody.innerHTML=p.matItems.map(item=>{
+  if(!p){return;}
+  const s=matSortState[sid];
+  // Refresh sort arrows before any early return, so the header always reflects
+  // the active sort even when the table is empty or filtered down to nothing.
+  ['name','qty','unit','total'].forEach(col=>{
+    const el=document.getElementById('msort_'+sid+'_'+col);
+    if(!el)return;
+    el.textContent=s&&s.col===col?(s.dir===1?'↑':'↓'):'↕';
+    el.classList.toggle('on',!!(s&&s.col===col));
+  });
+  // apply filter
+  const f=(matFilter[sid]||'').toLowerCase();
+  let items=f?p.matItems.filter(i=>i.name.toLowerCase().includes(f)):[...p.matItems];
+  if(!p.matItems.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No materials added yet</td></tr>';return;}
+  if(!items.length){tbody.innerHTML=`<tr class="empty-row"><td colspan="6">No items match "${escHtml(f)}"</td></tr>`;return;}
+  // apply sort
+  if(s&&s.col){
+    items.sort((a,b)=>{
+      const av=s.col==='total'?roundUp5(a.qty*a.unit*(1+a.markup/100)):a[s.col];
+      const bv=s.col==='total'?roundUp5(b.qty*b.unit*(1+b.markup/100)):b[s.col];
+      return(typeof av==='string'?av.localeCompare(bv):(av-bv))*s.dir;
+    });
+  }
+  tbody.innerHTML=items.map(item=>{
     const total=roundUp5(item.qty*item.unit*(1+item.markup/100));
     return `<tr>
       <td><input type="text" value="${escHtml(item.name)}" onchange="updateMaterial(${sid},${item.id},'name',this.value)"></td>
       <td><input type="number" value="${item.qty}" min="1" step="1" onchange="updateMaterial(${sid},${item.id},'qty',this.value)" style="text-align:right"></td>
       <td><div class="input-prefix" style="height:29px"><span>$</span><input type="number" value="${item.unit}" min="0" step="0.01" onchange="updateMaterial(${sid},${item.id},'unit',this.value)" style="text-align:right"></div></td>
       <td class="col-mobile-hide"><input type="number" value="${item.markup}" min="0" step="1" onchange="updateMaterial(${sid},${item.id},'markup',this.value)" style="text-align:right"></td>
-      <td><div class="line-total">${fmtMoney(total)}</div></td>
+      <td><div class="line-total" id="matLT_${sid}_${item.id}">${fmtMoney(total)}</div></td>
       <td><button class="del-btn" onclick="delMaterial(${sid},${item.id})"><i class="ti ti-trash" style="font-size:14px"></i></button></td>
     </tr>`;
   }).join('');
 }
+function setMatSort(sid,col){
+  const cur=matSortState[sid]||{col:null,dir:1};
+  matSortState[sid]=cur.col===col?{col,dir:cur.dir*-1}:{col,dir:1};
+  renderMaterials(sid);
+}
+function setMatFilter(sid,val){matFilter[sid]=val;renderMaterials(sid);}
 
 function renderLabor(sid){
   const tbody=document.getElementById('laborBody_'+sid);if(!tbody)return;
@@ -595,11 +803,11 @@ function renderLabor(sid){
     const total=roundUp5(item.techs*item.hours*item.rate);
     const ro='';
     return `<tr>
-      <td><input type="text" value="${escHtml(item.desc)}" onchange="updateLabor(${sid},${item.id},'desc',this.value)"></td>
+      <td><input type="text" id="laborDescRow_${sid}_${item.id}" value="${escHtml(item.desc)}" onchange="updateLabor(${sid},${item.id},'desc',this.value)"></td>
       <td class="col-mobile-hide"><input type="number" value="${item.techs}" min="1" step="1" onchange="updateLabor(${sid},${item.id},'techs',this.value);renderLabor(${sid})" style="text-align:right"></td>
       <td><input type="number" value="${item.hours}" min="0" step="0.25" onchange="updateLabor(${sid},${item.id},'hours',this.value)" style="text-align:right" ${ro}></td>
       <td><div class="input-prefix" style="height:29px"><span>$</span><input type="number" value="${item.rate}" min="0" step="1" onchange="updateLabor(${sid},${item.id},'rate',this.value)" style="text-align:right" ${ro}></div></td>
-      <td><div class="line-total">${fmtMoney(total)}</div></td>
+      <td><div class="line-total" id="laborLT_${sid}_${item.id}">${fmtMoney(total)}</div></td>
       <td><button class="del-btn" onclick="delLabor(${sid},${item.id})"><i class="ti ti-trash" style="font-size:14px"></i></button></td>
     </tr>`;
   }).join('');
@@ -610,10 +818,10 @@ function addMaterial(sid){
   const p=getPic(sid);if(!p)return;
   const name=document.getElementById('matSearch_'+sid).value.trim();
   if(!name){document.getElementById('matSearch_'+sid).focus();return;}
-  const qty=parseFloat(document.getElementById('matQty_'+sid).value)||1;
-  const unit=parseFloat(document.getElementById('matUnit_'+sid).value)||0;
-  const markup=parseFloat(document.getElementById('matMarkup_'+sid).value)||0;
-  p.matItems.push({id:Date.now(),name,qty,unit,markup});
+  const qty=Math.max(1,num(document.getElementById('matQty_'+sid).value,1));
+  const unit=num(document.getElementById('matUnit_'+sid).value,0);
+  const markup=num(document.getElementById('matMarkup_'+sid).value,0);
+  p.matItems.push({id:newId(),name,qty,unit,markup});
   document.getElementById('matSearch_'+sid).value='';
   document.getElementById('matUnit_'+sid).value='';
   document.getElementById('matQty_'+sid).value='1';
@@ -624,7 +832,13 @@ function delMaterial(sid,id){const p=getPic(sid);if(!p)return;p.matItems=p.matIt
 function updateMaterial(sid,id,field,val){
   const p=getPic(sid);if(!p)return;
   const item=p.matItems.find(i=>i.id===id);
-  if(item){item[field]=field==='name'?val:(parseFloat(val)||0);recalcTotals();scheduleSave();}
+  if(!item)return;
+  // qty has no zero/blank state — a "0 of something" line is meaningless and
+  // would silently zero the row's total instead of prompting deletion.
+  item[field]=field==='name'?val:field==='qty'?Math.max(1,num(val,1)):num(val,0);
+  const ltEl=document.getElementById('matLT_'+sid+'_'+id);
+  if(ltEl)ltEl.textContent=fmtMoney(roundUp5(item.qty*item.unit*(1+item.markup/100)));
+  recalcTotals();scheduleSave();
 }
 
 /* ── labor CRUD ── */
@@ -635,16 +849,15 @@ function laborTypeChange(sid){
 function addLabor(sid){
   const p=getPic(sid);if(!p)return;
   const t=document.getElementById('laborType_'+sid).value;
-  const techs=parseFloat(document.getElementById('laborTechs_'+sid).value)||1;
-  const hours=parseFloat(document.getElementById('laborHours_'+sid).value)||0;
-  const rate=parseFloat(document.getElementById('laborRate_'+sid).value)||50;
+  const techs=Math.max(1,num(document.getElementById('laborTechs_'+sid).value,1));
+  const hours=num(document.getElementById('laborHours_'+sid).value,0);
+  const rate=num(document.getElementById('laborRate_'+sid).value,50);
   let desc='';
-  if(t==='tech') desc=`${techs} Tech${techs>1?'s':''}, ${hours} ${hours===1?'Hour':'Hours'}`;
+  if(t==='tech') desc=techDesc(techs,hours);
   else desc=document.getElementById('laborDesc_'+sid).value.trim()||'Custom Labor';
-  p.laborItems.push({id:Date.now(),desc,techs,hours,rate,type:t});
+  p.laborItems.push({id:newId(),desc,techs,hours,rate,type:t});
   document.getElementById('laborTechs_'+sid).value='1';
   document.getElementById('laborHours_'+sid).value='1';
-  document.getElementById('laborRate_'+sid).value='50';
   document.getElementById('laborDesc_'+sid).value='';
   document.getElementById('laborType_'+sid).value='tech';
   laborTypeChange(sid);
@@ -655,9 +868,31 @@ function updateLabor(sid,id,field,val){
   const p=getPic(sid);if(!p)return;
   const item=p.laborItems.find(i=>i.id===id);
   if(!item)return;
-  item[field]=field==='desc'?val:(parseFloat(val)||0);
+  if(field==='desc'){
+    item.desc=val;
+    // Typing your own description takes manual control of this row, so an
+    // auto-generated label can't overwrite it on the next techs/hours edit.
+    item.type='custom';
+  } else {
+    // techs has no meaningful zero — 0 would silently zero the line total.
+    item[field]=field==='techs'?Math.max(1,num(val,1)):num(val,0);
+    // Auto-generated rows must keep their label in sync with their numbers,
+    // otherwise the Word output shows the client "1 Tech, 1 Hour ... $2,280".
+    if(item.type!=='custom'){
+      item.desc=techDesc(item.techs,item.hours);
+      const dEl=document.getElementById('laborDescRow_'+sid+'_'+id);
+      if(dEl)dEl.value=item.desc;
+    }
+  }
+  const ltEl=document.getElementById('laborLT_'+sid+'_'+id);
+  if(ltEl)ltEl.textContent=fmtMoney(roundUp5(item.techs*item.hours*item.rate));
   recalcTotals();scheduleSave();
 }
+
+/* ── bug report ── */
+function openBugReport(){document.getElementById('bugModal').classList.add('open');}
+function closeBugReport(){document.getElementById('bugModal').classList.remove('open');}
+document.getElementById('bugModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeBugReport();});
 
 /* ── global actions ── */
 function applyGlobalMarkup(){
@@ -672,8 +907,10 @@ function applyGlobalMarkup(){
 
 /* ── totals ── */
 function recalcTotals(){
-  const driveHrs=parseFloat(document.getElementById('globalDriveHours').value)||0;
-  const driveLt=driveHrs>0?roundUp5(driveHrs*150):0;
+  const driveHrs=num(document.getElementById('globalDriveHours').value,0);
+  const driveRate=num(document.getElementById('globalDriveRate').value,0);
+  const driveTechs=Math.max(1,num(document.getElementById('globalDriveTechs').value,1));
+  const driveLt=driveHrs>0?roundUp5(driveTechs*driveHrs*driveRate):0;
   let totalMatCost=0,totalMatBilled=0,totalLabor=0;
   pictures.forEach(p=>{
     let mc=0,mb=0,lt=0;
@@ -690,7 +927,24 @@ function recalcTotals(){
   document.getElementById('t_matBilled').textContent=fmtMoney(totalMatBilled);
   document.getElementById('t_labor').textContent=fmtMoney(totalLabor);
   document.getElementById('t_grand').textContent=fmtMoney(grand);
-  document.getElementById('t_margin').textContent=margin.toFixed(1)+'% overall margin';
+  // NOTE: this subtracts material cost only — labor cost isn't tracked anywhere
+  // in the app, so this is gross profit over materials, not a true net margin.
+  document.getElementById('t_margin').textContent=margin.toFixed(1)+'% over material cost';
+  // per-picture row
+  if(activeId===INVENTORY_ID){
+    ['p_labor','p_matCost','p_matBilled','p_total'].forEach(id=>{document.getElementById(id).textContent='—';});
+  } else {
+    const ap=getPic(activeId);
+    let pmc=0,pmb=0,plt=0;
+    if(ap){
+      ap.matItems.forEach(i=>{const c=i.qty*i.unit;pmc+=c;pmb+=roundUp5(c*(1+i.markup/100));});
+      ap.laborItems.forEach(i=>{plt+=roundUp5(i.techs*i.hours*i.rate);});
+    }
+    document.getElementById('p_labor').textContent=fmtMoney(plt);
+    document.getElementById('p_matCost').textContent=fmtMoney(pmc);
+    document.getElementById('p_matBilled').textContent=fmtMoney(pmb);
+    document.getElementById('p_total').textContent=fmtMoney(pmb+plt);
+  }
 }
 
 /* ── suggestions ── */
@@ -705,11 +959,19 @@ function showSuggestions(e,sid){
   activeSearchEl=e.target;
   const q=e.target.value.trim().toLowerCase();
   if(q.length<1){sugEl.style.display='none';return;}
-  const matches=CATALOG.filter(i=>i.name.toLowerCase().includes(q)).slice(0,12);
+  const matches=fullCatalog().filter(i=>i.name.toLowerCase().includes(q)).slice(0,12);
   if(!matches.length){sugEl.style.display='none';return;}
   sugEl.innerHTML=matches.map((m,i)=>`<div class="suggestion-item" data-i="${i}" onmousedown="pickSuggestion(this,${sid})">${escHtml(m.name)}<small>${escHtml(m.cat)}</small></div>`).join('');
   sugEl.querySelectorAll('.suggestion-item').forEach((el,i)=>el._name=matches[i].name);
   sugEl.style.display='block';positionSuggestions();sugIdx=-1;
+}
+function saveToCatalog(sid){
+  const name=document.getElementById('matSearch_'+sid).value.trim();
+  if(!name){document.getElementById('matSearch_'+sid).focus();return;}
+  if(fullCatalog().some(c=>c.name.toLowerCase()===name.toLowerCase())){alert('"'+name+'" is already in the catalog.');return;}
+  customCatalog.push({name,cat:'Custom'});
+  try{localStorage.setItem(STORAGE_KEY+'_cat',JSON.stringify(customCatalog));}catch(e){}
+  alert('"'+name+'" added to catalog.');
 }
 function pickSuggestion(el,sid){
   document.getElementById('matSearch_'+sid).value=el._name;
@@ -747,8 +1009,10 @@ function buildRows(){
   const O  = '#d76600'; // brand orange — all rows
   const W  = '#ffffff'; // white text
   const BD = '#ffffff'; // white borders
-  const driveHrs = parseFloat(document.getElementById('globalDriveHours').value)||0;
-  const driveTotal = driveHrs > 0 ? roundUp5(driveHrs * 150) : 0;
+  const driveHrs = num(document.getElementById('globalDriveHours').value,0);
+  const driveRate = num(document.getElementById('globalDriveRate').value,0);
+  const driveTechs = Math.max(1,num(document.getElementById('globalDriveTechs').value,1));
+  const driveTotal = driveHrs > 0 ? roundUp5(driveTechs * driveHrs * driveRate) : 0;
   let rows = '';
   let totalBilled = 0, totalLabor = 0;
 
@@ -772,17 +1036,16 @@ function buildRows(){
         <b><font face="Times New Roman" color="${W}">Materials Required</font></b>
       </td></tr>`;
       // Column headers — underlined to distinguish from data
+      // Client-facing only — raw cost stays internal, so no pre-markup column here.
       rows += `<tr>
         ${cell('<u>Qty</u>',  1,'left', true,O,W)}
-        ${cell('<u>Material</u>',2,'left', true,O,W)}
-        ${cell('<u>Cost</u>',    1,'right',true,O,W)}
-        ${cell('<u>Billed</u>',  1,'right',true,O,W)}
+        ${cell('<u>Material</u>',3,'left', true,O,W)}
+        ${cell('<u>Total</u>',   1,'right',true,O,W)}
       </tr>`;
       p.matItems.forEach(i => {
         rows += `<tr>
           ${cell(escHtml(String(i.qty)),                              1,'left', false,O,W)}
-          ${cell(escHtml(i.name),                                     2,'left', false,O,W)}
-          ${cell(escHtml(fmtMoney(i.qty*i.unit)),                     1,'right',false,O,W)}
+          ${cell(escHtml(i.name),                                     3,'left', false,O,W)}
           ${cell(escHtml(fmtMoney(roundUp5(i.qty*i.unit*(1+i.markup/100)))),    1,'right',false,O,W)}
         </tr>`;
       });
@@ -801,7 +1064,7 @@ function buildRows(){
       p.laborItems.forEach(i => {
         rows += `<tr>
           ${cell(escHtml(i.desc),                              3,'left', false,O,W)}
-          ${cell(escHtml('$'+i.rate+'/hr'),                    1,'right',false,O,W)}
+          ${cell(escHtml(fmtMoney(i.rate)+'/hr'),              1,'right',false,O,W)}
           ${cell(escHtml(fmtMoney(roundUp5(i.techs*i.hours*i.rate))),   1,'right',false,O,W)}
         </tr>`;
       });
@@ -824,7 +1087,7 @@ function buildRows(){
       <b><font face="Times New Roman" color="${W}">Total Drive Time</font></b>
     </td></tr>`;
     rows += `<tr>
-      ${cell(driveHrs+' '+(driveHrs===1?'Hour':'Hours')+' @ $150/hr', 4,'left', false,O,W)}
+      ${cell(driveTechs+' Tech'+(driveTechs>1?'s':'')+', '+driveHrs+' '+(driveHrs===1?'Hour':'Hours')+' @ '+fmtMoney(driveRate)+'/hr', 4,'left', false,O,W)}
       ${cell(escHtml(fmtMoney(driveTotal)), 1,'right',false,O,W)}
     </tr>`;
     totalLabor += driveTotal;
@@ -862,8 +1125,12 @@ function generateOutput(){
   const client = document.getElementById('clientName').value;
   const title = `<p style="font-family:'Times New Roman',serif;font-size:14pt;font-weight:bold;margin:0 0 10px;">${escHtml(qName)}${client ? ' &mdash; ' + escHtml(client) : ''}</p>`;
   document.getElementById('outputDiv').innerHTML = title + buildTable();
-  document.getElementById('outputModal').classList.add('show');
+  const modal = document.getElementById('outputModal');
+  modal.classList.add('show');
   copyOutput();
+  // The "Copied to clipboard" toast lives inside this panel, which is below the
+  // fold on a long quote — scroll to it so the copy is visibly confirmed.
+  modal.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function copyOutput(){
@@ -898,6 +1165,27 @@ if(!pictures.length) addPicture();
 else{renderTabBar();renderActivePanel();}
 recalcTotals();
 onDriveTimeChange(); // set initial zero-warning state
+
+// tab bar scroll arrows
+document.getElementById('tabBar').addEventListener('scroll',updateTabScrollBtns);
+
+// tab bar drag-to-scroll
+(function(){
+  const bar=document.getElementById('tabBar');
+  let down=false,startX=0,startScroll=0,moved=false;
+  bar.addEventListener('mousedown',e=>{
+    down=true;moved=false;startX=e.clientX;startScroll=bar.scrollLeft;
+    bar.classList.add('dragging');
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!down)return;
+    const dx=e.clientX-startX;
+    if(Math.abs(dx)>4)moved=true;
+    if(moved){bar.scrollLeft=startScroll-dx;updateTabScrollBtns();}
+  });
+  window.addEventListener('mouseup',()=>{down=false;bar.classList.remove('dragging');});
+  bar.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false;}},true);
+})();
 </script>
 </body>
 </html>
