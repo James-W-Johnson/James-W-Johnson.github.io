@@ -33,6 +33,7 @@
     .header p{font-size:13px;color:var(--txt2);margin-top:3px;padding-left:14px}
     .save-status{font-size:11px;color:var(--txt3);margin-top:5px;height:14px;transition:color .3s}
     .save-status.saved{color:var(--success)}
+    .save-status.save-failed{color:#dc2626;font-weight:700}
 
     /* ── job meta ── */
     .job-meta{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem}
@@ -302,6 +303,15 @@
         <span>%</span>
         <button onclick="applyGlobalMarkup()">Apply to all pictures</button>
       </div>
+      <div class="gb-divider"></div>
+      <div class="setting-group">
+        <i class="ti ti-arrow-bar-to-up" aria-hidden="true"></i>
+        <span>Round up to $5</span>
+        <select id="roundMode" onchange="setRoundMode(this.value)">
+          <option value="total">Job total only</option>
+          <option value="line">Every line</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -358,7 +368,7 @@
   </div>
 
   <div class="page-footer">
-    Built for internal use for <strong>SI Testing</strong> &nbsp;·&nbsp; <a href="https://jwalkerjohnson.com" target="_blank">jwalkerjohnson.com</a> &nbsp;·&nbsp; <button class="footer-bug-btn" onclick="openBugReport()">Report a bug</button>
+    <a href="https://jwalkerjohnson.com" target="_blank">jwalkerjohnson.com</a> &nbsp;·&nbsp; <button class="footer-bug-btn" onclick="openBugReport()">Report a bug</button>
   </div>
 
 </div>
@@ -399,7 +409,66 @@ const sugEl=document.getElementById('suggestions');
 
 /* ── utils ── */
 function fmtMoney(v){return '$'+parseFloat(v).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
-function roundUp5(v){return Math.ceil(v/5)*5;}
+
+/* ══════════════ PRICING — single source of truth ══════════════
+   Every price in the app comes from this block. It used to be copy-pasted
+   across the line rows, the totals bar, the inventory panel and the Word
+   export, so a math bug had to be fixed in five places and never was.
+
+   All money math runs in integer CENTS. In floating point,
+   100 * 1.10 === 110.00000000000001, which then rounds up to the next $5
+   and silently overcharges the client $5 on a $100 item.
+
+   Rounding mode:
+     'total' (default) — line totals are exact, the job total rounds up to $5.
+     'line'            — every line rounds up to $5 (the old behavior, which
+                         bills a $0.30 wire nut at $5 and pads a 20-line job
+                         by roughly $100).                                  */
+let roundMode='total';                       // 'total' | 'line'
+// dollars -> integer cents. The toFixed step matters: 1.005 * 100 is
+// 100.49999999999999 in binary floating point, so a plain Math.round()
+// would bill $1.00 for a $1.005 part.
+const toCents=v=>Math.round(Number((Math.max(0,num(v,0))*100).toFixed(4)));
+const fromCents=c=>c/100;                    // integer cents -> dollars
+function roundUp5Cents(c){return Math.ceil(c/500)*500;}
+
+// Exact line values, in cents. Every input is clamped at 0 — a negative qty,
+// price, rate or markup produces a credit that silently cuts the job total.
+function matLineCents(i){
+  const qty=Math.max(0,num(i.qty,0));
+  const markup=Math.max(0,num(i.markup,0));
+  return Math.round(qty*toCents(i.unit)*(1+markup/100));
+}
+function matCostCents(i){
+  return Math.round(Math.max(0,num(i.qty,0))*toCents(i.unit));
+}
+function laborLineCents(i){
+  const techs=Math.max(0,num(i.techs,0));
+  const hours=Math.max(0,num(i.hours,0));
+  return Math.round(techs*hours*toCents(i.rate));
+}
+// What a single line DISPLAYS — rounded only when the user opted into
+// per-line rounding.
+const matLineDisplayCents  = i => roundMode==='line'?roundUp5Cents(matLineCents(i)):matLineCents(i);
+const laborLineDisplayCents= i => roundMode==='line'?roundUp5Cents(laborLineCents(i)):laborLineCents(i);
+const matLineTotal   = i => fromCents(matLineDisplayCents(i));
+const laborLineTotal = i => fromCents(laborLineDisplayCents(i));
+// Drive time is one line, so it follows the same rule.
+function driveLineCents(techs,hours,rate){
+  if(!(hours>0))return 0;
+  const c=Math.round(Math.max(0,techs)*Math.max(0,hours)*toCents(rate));
+  return roundMode==='line'?roundUp5Cents(c):c;
+}
+// The job total — rounded up to $5 here when rounding per line is off.
+const grandTotalCents = c => roundMode==='total'?roundUp5Cents(c):c;
+
+function setRoundMode(mode){
+  roundMode=mode==='line'?'line':'total';
+  const p=getPic(activeId);
+  if(p){renderMaterials(p.id);renderLabor(p.id);}
+  else if(activeId===INVENTORY_ID)renderInventoryPanel();
+  recalcTotals();scheduleSave();
+}
 // NaN-safe parse: only falls back when the value can't be parsed, so a
 // deliberate 0 (e.g. a no-charge labor line) is respected, not overwritten.
 function num(v,d){const n=parseFloat(v);return Number.isFinite(n)?n:d;}
@@ -411,7 +480,7 @@ function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function getPic(id){return pictures.find(p=>p.id===id);}
 function techDesc(techs,hours){return `${techs} Tech${techs>1?'s':''}, ${hours} ${hours===1?'Hour':'Hours'}`;}
 function gMarkup(){return globalMarkupVal;}
-function setGlobalMarkup(v){globalMarkupVal=parseFloat(v)||0;scheduleSave();}
+function setGlobalMarkup(v){globalMarkupVal=Math.max(0,num(v,0));scheduleSave();}
 function onDriveTimeChange(){
   recalcTotals();
   scheduleSave();
@@ -431,15 +500,27 @@ function saveState(){
     quoteName:document.getElementById('quoteName').value,
     clientName:document.getElementById('clientName').value,
     globalMarkup:globalMarkupVal,
+    roundMode,
     globalDriveTechs:document.getElementById('globalDriveTechs').value,
     globalDriveHours:document.getElementById('globalDriveHours').value,
     globalDriveRate:document.getElementById('globalDriveRate').value,
     pictures,activeId
   };
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){}
   const el=document.getElementById('saveStatus');
-  el.textContent='Draft saved';el.classList.add('saved');
-  setTimeout(()=>{el.textContent='Draft auto-saved to this browser';el.classList.remove('saved');},1500);
+  let ok=true;
+  // Private mode and a full quota both make setItem throw. Reporting
+  // "Draft saved" anyway tells the user their work is safe when it isn't.
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(e){ok=false;}
+  if(ok){
+    el.textContent='Draft saved';el.classList.add('saved');el.classList.remove('save-failed');
+    setTimeout(()=>{
+      if(el.classList.contains('save-failed'))return;
+      el.textContent='Draft auto-saved to this browser';el.classList.remove('saved');
+    },1500);
+  } else {
+    el.textContent='NOT SAVED — copy your quote out before closing';
+    el.classList.remove('saved');el.classList.add('save-failed');
+  }
 }
 function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(saveState,600);}
 function loadState(){
@@ -448,10 +529,15 @@ function loadState(){
   if(!state)return;
   if(state.quoteName) document.getElementById('quoteName').value=state.quoteName;
   if(state.clientName) document.getElementById('clientName').value=state.clientName;
-  if(state.globalMarkup!=null){globalMarkupVal=parseFloat(state.globalMarkup)||45;const el=document.getElementById('globalMarkup');if(el)el.value=globalMarkupVal;}
-  if(state.globalDriveTechs!=null){const el=document.getElementById('globalDriveTechs');if(el)el.value=parseFloat(state.globalDriveTechs)||1;}
-  if(state.globalDriveHours!=null){const el=document.getElementById('globalDriveHours');if(el)el.value=parseFloat(state.globalDriveHours)||0;}
-  if(state.globalDriveRate!=null){const el=document.getElementById('globalDriveRate');if(el)el.value=parseFloat(state.globalDriveRate)||150;}
+  // num() instead of `|| default`: a saved 0 is falsy, so `||` threw away a
+  // deliberate 0% markup (came back 45%) and a $0 drive rate (came back $150),
+  // quietly changing the price of a reopened quote.
+  if(state.roundMode) roundMode=state.roundMode==='line'?'line':'total';
+  const rmEl=document.getElementById('roundMode'); if(rmEl) rmEl.value=roundMode;
+  if(state.globalMarkup!=null){globalMarkupVal=Math.max(0,num(state.globalMarkup,45));const el=document.getElementById('globalMarkup');if(el)el.value=globalMarkupVal;}
+  if(state.globalDriveTechs!=null){const el=document.getElementById('globalDriveTechs');if(el)el.value=Math.max(1,num(state.globalDriveTechs,1));}
+  if(state.globalDriveHours!=null){const el=document.getElementById('globalDriveHours');if(el)el.value=Math.max(0,num(state.globalDriveHours,0));}
+  if(state.globalDriveRate!=null){const el=document.getElementById('globalDriveRate');if(el)el.value=Math.max(0,num(state.globalDriveRate,150));}
   if(Array.isArray(state.pictures)&&state.pictures.length){
     pictures=state.pictures;
     // Backfill any field an older saved draft is missing. A single undefined
@@ -462,14 +548,14 @@ function loadState(){
       p.laborItems=Array.isArray(p.laborItems)?p.laborItems:[];
       p.matItems.forEach(i=>{
         i.name=i.name||'';
-        i.qty=Math.max(1,num(i.qty,1));
-        i.unit=num(i.unit,0);
-        i.markup=num(i.markup,globalMarkupVal);
+        i.qty=Math.max(0,num(i.qty,1));
+        i.unit=Math.max(0,num(i.unit,0));
+        i.markup=Math.max(0,num(i.markup,globalMarkupVal));
       });
       p.laborItems.forEach(i=>{
-        i.techs=Math.max(1,num(i.techs,1));
-        i.hours=num(i.hours,0);
-        i.rate=num(i.rate,50);
+        i.techs=Math.max(0,num(i.techs,1));
+        i.hours=Math.max(0,num(i.hours,0));
+        i.rate=Math.max(0,num(i.rate,50));
         i.type=i.type||'tech';
         i.desc=i.desc||techDesc(i.techs,i.hours);
       });
@@ -541,11 +627,17 @@ function toggleInventory(){
 }
 function renderInventoryPanel(){
   const panel=document.getElementById('picturePanel');
+  // This function replaces the panel's innerHTML, which includes the search
+  // box itself — so typing destroyed the focused element after every
+  // keystroke. Remember the caret, restore it after the rebuild.
+  const prev=document.getElementById('invSearchInput');
+  const hadFocus=prev&&document.activeElement===prev;
+  const caret=prev?prev.selectionStart:null;
   let rows=[];
   pictures.forEach((p,i)=>{
     const picName=p.name||'Picture '+(i+1);
     p.matItems.forEach(item=>{
-      rows.push({picName,picId:p.id,...item,total:roundUp5(item.qty*item.unit*(1+item.markup/100))});
+      rows.push({picName,picId:p.id,...item,total:matLineTotal(item)});
     });
   });
   const q=invSearch.toLowerCase();
@@ -560,7 +652,7 @@ function renderInventoryPanel(){
       <span style="font-size:14px;font-weight:600;color:var(--txt)">All Materials</span>
       <div class="inv-search-wrap">
         <i class="ti ti-search" style="font-size:13px;color:var(--txt3)"></i>
-        <input type="text" placeholder="Search items or pictures…" value="${escHtml(invSearch)}"
+        <input type="text" id="invSearchInput" placeholder="Search items or pictures…" value="${escHtml(invSearch)}"
           oninput="invSearch=this.value;renderInventoryPanel()">
       </div>
       <span style="font-size:12px;color:var(--txt3)">${rows.length} item${rows.length!==1?'s':''}</span>
@@ -586,6 +678,10 @@ function renderInventoryPanel(){
       </tr>`).join('')}</tbody>
     </table>`:`<div style="padding:2.5rem;text-align:center;color:var(--txt3);font-size:13px;font-style:italic">No materials added yet</div>`}
   </div>`;
+  if(hadFocus){
+    const next=document.getElementById('invSearchInput');
+    if(next){next.focus();if(caret!=null)try{next.setSelectionRange(caret,caret);}catch(e){}}
+  }
 }
 function setInvSort(col){
   invSort=invSort.col===col?{col,dir:invSort.dir*-1}:{col,dir:1};
@@ -677,13 +773,13 @@ function materialsCardHTML(p){
         </div>
         <div class="add-row-field">
           <label>Qty</label>
-          <input type="number" id="matQty_${sid}" value="1" min="1" style="width:60px">
+          <input type="number" id="matQty_${sid}" value="1" min="0" step="any" style="width:60px">
         </div>
         <div class="add-row-field">
           <label>Unit price</label>
           <div class="input-prefix" style="width:100px;height:30px">
             <span>$</span>
-            <input type="number" id="matUnit_${sid}" placeholder="0.00" min="0" step="0.01" style="text-align:right">
+            <input type="number" id="matUnit_${sid}" placeholder="0.00" min="0" step="any" style="text-align:right">
           </div>
         </div>
         <div class="add-row-field">
@@ -730,17 +826,17 @@ function laborCardHTML(p){
         </div>
         <div class="add-row-field">
           <label>Techs</label>
-          <input type="number" id="laborTechs_${sid}" value="1" min="1" style="width:58px">
+          <input type="number" id="laborTechs_${sid}" value="1" min="0" step="any" style="width:58px">
         </div>
         <div class="add-row-field">
           <label>Hours</label>
-          <input type="number" id="laborHours_${sid}" value="1" min="0" step="0.25" style="width:68px">
+          <input type="number" id="laborHours_${sid}" value="1" min="0" step="any" style="width:68px">
         </div>
         <div class="add-row-field">
           <label>Rate/hr</label>
           <div class="input-prefix" style="width:88px;height:30px">
             <span>$</span>
-            <input type="number" id="laborRate_${sid}" value="50" min="0" step="1" style="text-align:right">
+            <input type="number" id="laborRate_${sid}" value="50" min="0" step="any" style="text-align:right">
           </div>
         </div>
         <button class="add-btn" onclick="addLabor(${sid})"><i class="ti ti-plus" aria-hidden="true"></i> Add</button>
@@ -771,17 +867,17 @@ function renderMaterials(sid){
   // apply sort
   if(s&&s.col){
     items.sort((a,b)=>{
-      const av=s.col==='total'?roundUp5(a.qty*a.unit*(1+a.markup/100)):a[s.col];
-      const bv=s.col==='total'?roundUp5(b.qty*b.unit*(1+b.markup/100)):b[s.col];
+      const av=s.col==='total'?matLineTotal(a):a[s.col];
+      const bv=s.col==='total'?matLineTotal(b):b[s.col];
       return(typeof av==='string'?av.localeCompare(bv):(av-bv))*s.dir;
     });
   }
   tbody.innerHTML=items.map(item=>{
-    const total=roundUp5(item.qty*item.unit*(1+item.markup/100));
+    const total=matLineTotal(item);
     return `<tr>
       <td><input type="text" value="${escHtml(item.name)}" onchange="updateMaterial(${sid},${item.id},'name',this.value)"></td>
-      <td><input type="number" value="${item.qty}" min="1" step="1" onchange="updateMaterial(${sid},${item.id},'qty',this.value)" style="text-align:right"></td>
-      <td><div class="input-prefix" style="height:29px"><span>$</span><input type="number" value="${item.unit}" min="0" step="0.01" onchange="updateMaterial(${sid},${item.id},'unit',this.value)" style="text-align:right"></div></td>
+      <td><input type="number" value="${item.qty}" min="0" step="any" onchange="updateMaterial(${sid},${item.id},'qty',this.value)" style="text-align:right"></td>
+      <td><div class="input-prefix" style="height:29px"><span>$</span><input type="number" value="${item.unit}" min="0" step="any" onchange="updateMaterial(${sid},${item.id},'unit',this.value)" style="text-align:right"></div></td>
       <td class="col-mobile-hide"><input type="number" value="${item.markup}" min="0" step="1" onchange="updateMaterial(${sid},${item.id},'markup',this.value)" style="text-align:right"></td>
       <td><div class="line-total" id="matLT_${sid}_${item.id}">${fmtMoney(total)}</div></td>
       <td><button class="del-btn" onclick="delMaterial(${sid},${item.id})"><i class="ti ti-trash" style="font-size:14px"></i></button></td>
@@ -800,12 +896,12 @@ function renderLabor(sid){
   const p=getPic(sid);
   if(!p||!p.laborItems.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No labor added yet</td></tr>';return;}
   tbody.innerHTML=p.laborItems.map(item=>{
-    const total=roundUp5(item.techs*item.hours*item.rate);
+    const total=laborLineTotal(item);
     const ro='';
     return `<tr>
       <td><input type="text" id="laborDescRow_${sid}_${item.id}" value="${escHtml(item.desc)}" onchange="updateLabor(${sid},${item.id},'desc',this.value)"></td>
-      <td class="col-mobile-hide"><input type="number" value="${item.techs}" min="1" step="1" onchange="updateLabor(${sid},${item.id},'techs',this.value);renderLabor(${sid})" style="text-align:right"></td>
-      <td><input type="number" value="${item.hours}" min="0" step="0.25" onchange="updateLabor(${sid},${item.id},'hours',this.value)" style="text-align:right" ${ro}></td>
+      <td class="col-mobile-hide"><input type="number" value="${item.techs}" min="0" step="any" onchange="updateLabor(${sid},${item.id},'techs',this.value);renderLabor(${sid})" style="text-align:right"></td>
+      <td><input type="number" value="${item.hours}" min="0" step="any" onchange="updateLabor(${sid},${item.id},'hours',this.value)" style="text-align:right" ${ro}></td>
       <td><div class="input-prefix" style="height:29px"><span>$</span><input type="number" value="${item.rate}" min="0" step="1" onchange="updateLabor(${sid},${item.id},'rate',this.value)" style="text-align:right" ${ro}></div></td>
       <td><div class="line-total" id="laborLT_${sid}_${item.id}">${fmtMoney(total)}</div></td>
       <td><button class="del-btn" onclick="delLabor(${sid},${item.id})"><i class="ti ti-trash" style="font-size:14px"></i></button></td>
@@ -818,9 +914,9 @@ function addMaterial(sid){
   const p=getPic(sid);if(!p)return;
   const name=document.getElementById('matSearch_'+sid).value.trim();
   if(!name){document.getElementById('matSearch_'+sid).focus();return;}
-  const qty=Math.max(1,num(document.getElementById('matQty_'+sid).value,1));
-  const unit=num(document.getElementById('matUnit_'+sid).value,0);
-  const markup=num(document.getElementById('matMarkup_'+sid).value,0);
+  const qty=Math.max(0,num(document.getElementById('matQty_'+sid).value,1));
+  const unit=Math.max(0,num(document.getElementById('matUnit_'+sid).value,0));
+  const markup=Math.max(0,num(document.getElementById('matMarkup_'+sid).value,0));
   p.matItems.push({id:newId(),name,qty,unit,markup});
   document.getElementById('matSearch_'+sid).value='';
   document.getElementById('matUnit_'+sid).value='';
@@ -833,11 +929,15 @@ function updateMaterial(sid,id,field,val){
   const p=getPic(sid);if(!p)return;
   const item=p.matItems.find(i=>i.id===id);
   if(!item)return;
-  // qty has no zero/blank state — a "0 of something" line is meaningless and
-  // would silently zero the row's total instead of prompting deletion.
-  item[field]=field==='name'?val:field==='qty'?Math.max(1,num(val,1)):num(val,0);
+  // Fractional qty is real (0.5 of a 250ft spool), so only the sign is
+  // clamped, not the precision. Negatives are rejected everywhere — a
+  // negative qty, price or markup produces a credit that quietly cuts
+  // the job total.
+  item[field]=field==='name'?val
+             :field==='qty'?Math.max(0,num(val,0))
+             :Math.max(0,num(val,0));
   const ltEl=document.getElementById('matLT_'+sid+'_'+id);
-  if(ltEl)ltEl.textContent=fmtMoney(roundUp5(item.qty*item.unit*(1+item.markup/100)));
+  if(ltEl)ltEl.textContent=fmtMoney(matLineTotal(item));
   recalcTotals();scheduleSave();
 }
 
@@ -849,9 +949,9 @@ function laborTypeChange(sid){
 function addLabor(sid){
   const p=getPic(sid);if(!p)return;
   const t=document.getElementById('laborType_'+sid).value;
-  const techs=Math.max(1,num(document.getElementById('laborTechs_'+sid).value,1));
-  const hours=num(document.getElementById('laborHours_'+sid).value,0);
-  const rate=num(document.getElementById('laborRate_'+sid).value,50);
+  const techs=Math.max(0,num(document.getElementById('laborTechs_'+sid).value,1));
+  const hours=Math.max(0,num(document.getElementById('laborHours_'+sid).value,0));
+  const rate=Math.max(0,num(document.getElementById('laborRate_'+sid).value,50));
   let desc='';
   if(t==='tech') desc=techDesc(techs,hours);
   else desc=document.getElementById('laborDesc_'+sid).value.trim()||'Custom Labor';
@@ -874,8 +974,8 @@ function updateLabor(sid,id,field,val){
     // auto-generated label can't overwrite it on the next techs/hours edit.
     item.type='custom';
   } else {
-    // techs has no meaningful zero — 0 would silently zero the line total.
-    item[field]=field==='techs'?Math.max(1,num(val,1)):num(val,0);
+    // Half a tech-hour is a normal entry; negatives never are.
+    item[field]=Math.max(0,num(val,0));
     // Auto-generated rows must keep their label in sync with their numbers,
     // otherwise the Word output shows the client "1 Tech, 1 Hour ... $2,280".
     if(item.type!=='custom'){
@@ -885,7 +985,7 @@ function updateLabor(sid,id,field,val){
     }
   }
   const ltEl=document.getElementById('laborLT_'+sid+'_'+id);
-  if(ltEl)ltEl.textContent=fmtMoney(roundUp5(item.techs*item.hours*item.rate));
+  if(ltEl)ltEl.textContent=fmtMoney(laborLineTotal(item));
   recalcTotals();scheduleSave();
 }
 
@@ -910,19 +1010,24 @@ function recalcTotals(){
   const driveHrs=num(document.getElementById('globalDriveHours').value,0);
   const driveRate=num(document.getElementById('globalDriveRate').value,0);
   const driveTechs=Math.max(1,num(document.getElementById('globalDriveTechs').value,1));
-  const driveLt=driveHrs>0?roundUp5(driveTechs*driveHrs*driveRate):0;
-  let totalMatCost=0,totalMatBilled=0,totalLabor=0;
+  const driveLtC=driveLineCents(driveTechs,driveHrs,driveRate);
+  let totalMatCostC=0,totalMatBilledC=0,totalLaborC=0;
   pictures.forEach(p=>{
-    let mc=0,mb=0,lt=0;
-    p.matItems.forEach(i=>{const c=i.qty*i.unit;mc+=c;mb+=roundUp5(c*(1+i.markup/100));});
-    p.laborItems.forEach(i=>{lt+=roundUp5(i.techs*i.hours*i.rate);});
-    const el=document.getElementById('matSubtotal_'+p.id);if(el)el.textContent=fmtMoney(mb);
-    const le=document.getElementById('laborSubtotal_'+p.id);if(le)le.textContent=fmtMoney(lt);
-    totalMatCost+=mc;totalMatBilled+=mb;totalLabor+=lt;
+    let mcC=0,mbC=0,ltC=0;
+    p.matItems.forEach(i=>{mcC+=matCostCents(i);mbC+=matLineDisplayCents(i);});
+    p.laborItems.forEach(i=>{ltC+=laborLineDisplayCents(i);});
+    const el=document.getElementById('matSubtotal_'+p.id);if(el)el.textContent=fmtMoney(fromCents(mbC));
+    const le=document.getElementById('laborSubtotal_'+p.id);if(le)le.textContent=fmtMoney(fromCents(ltC));
+    totalMatCostC+=mcC;totalMatBilledC+=mbC;totalLaborC+=ltC;
   });
-  totalLabor+=driveLt;
-  const grand=totalMatBilled+totalLabor;
-  const margin=grand>0?((grand-totalMatCost)/grand*100):0;
+  totalLaborC+=driveLtC;
+  // The $5 round-up lands here (once) unless the user opted into per-line rounding.
+  const grandC=grandTotalCents(totalMatBilledC+totalLaborC);
+  const totalMatCost=fromCents(totalMatCostC);
+  const totalMatBilled=fromCents(totalMatBilledC);
+  const totalLabor=fromCents(totalLaborC);
+  const grand=fromCents(grandC);
+  const margin=grandC>0?((grandC-totalMatCostC)/grandC*100):0;
   document.getElementById('t_matCost').textContent=fmtMoney(totalMatCost);
   document.getElementById('t_matBilled').textContent=fmtMoney(totalMatBilled);
   document.getElementById('t_labor').textContent=fmtMoney(totalLabor);
@@ -935,15 +1040,15 @@ function recalcTotals(){
     ['p_labor','p_matCost','p_matBilled','p_total'].forEach(id=>{document.getElementById(id).textContent='—';});
   } else {
     const ap=getPic(activeId);
-    let pmc=0,pmb=0,plt=0;
+    let pmcC=0,pmbC=0,pltC=0;
     if(ap){
-      ap.matItems.forEach(i=>{const c=i.qty*i.unit;pmc+=c;pmb+=roundUp5(c*(1+i.markup/100));});
-      ap.laborItems.forEach(i=>{plt+=roundUp5(i.techs*i.hours*i.rate);});
+      ap.matItems.forEach(i=>{pmcC+=matCostCents(i);pmbC+=matLineDisplayCents(i);});
+      ap.laborItems.forEach(i=>{pltC+=laborLineDisplayCents(i);});
     }
-    document.getElementById('p_labor').textContent=fmtMoney(plt);
-    document.getElementById('p_matCost').textContent=fmtMoney(pmc);
-    document.getElementById('p_matBilled').textContent=fmtMoney(pmb);
-    document.getElementById('p_total').textContent=fmtMoney(pmb+plt);
+    document.getElementById('p_labor').textContent=fmtMoney(fromCents(pltC));
+    document.getElementById('p_matCost').textContent=fmtMoney(fromCents(pmcC));
+    document.getElementById('p_matBilled').textContent=fmtMoney(fromCents(pmbC));
+    document.getElementById('p_total').textContent=fmtMoney(fromCents(pmbC+pltC));
   }
 }
 
@@ -1012,15 +1117,17 @@ function buildRows(){
   const driveHrs = num(document.getElementById('globalDriveHours').value,0);
   const driveRate = num(document.getElementById('globalDriveRate').value,0);
   const driveTechs = Math.max(1,num(document.getElementById('globalDriveTechs').value,1));
-  const driveTotal = driveHrs > 0 ? roundUp5(driveTechs * driveHrs * driveRate) : 0;
+  const driveTotalCents = driveLineCents(driveTechs, driveHrs, driveRate);
+  const driveTotal = fromCents(driveTotalCents);
   let rows = '';
-  let totalBilled = 0, totalLabor = 0;
+  let totalBilledC = 0, totalLaborC = 0;
 
   pictures.forEach((p, idx) => {
-    let mb = 0, lt = 0;
-    p.matItems.forEach(i  => { mb += roundUp5(i.qty * i.unit * (1 + i.markup / 100)); });
-    p.laborItems.forEach(i => { lt += roundUp5(i.techs * i.hours * i.rate); });
-    totalBilled += mb; totalLabor += lt;
+    let mbC = 0, ltC = 0;
+    p.matItems.forEach(i  => { mbC += matLineDisplayCents(i); });
+    p.laborItems.forEach(i => { ltC += laborLineDisplayCents(i); });
+    totalBilledC += mbC; totalLaborC += ltC;
+    const mb = fromCents(mbC), lt = fromCents(ltC);
 
     const picName = escHtml(p.name || 'Picture ' + (idx + 1));
 
@@ -1046,7 +1153,7 @@ function buildRows(){
         rows += `<tr>
           ${cell(escHtml(String(i.qty)),                              1,'left', false,O,W)}
           ${cell(escHtml(i.name),                                     3,'left', false,O,W)}
-          ${cell(escHtml(fmtMoney(roundUp5(i.qty*i.unit*(1+i.markup/100)))),    1,'right',false,O,W)}
+          ${cell(escHtml(fmtMoney(matLineTotal(i))),    1,'right',false,O,W)}
         </tr>`;
       });
     }
@@ -1065,7 +1172,7 @@ function buildRows(){
         rows += `<tr>
           ${cell(escHtml(i.desc),                              3,'left', false,O,W)}
           ${cell(escHtml(fmtMoney(i.rate)+'/hr'),              1,'right',false,O,W)}
-          ${cell(escHtml(fmtMoney(roundUp5(i.techs*i.hours*i.rate))),   1,'right',false,O,W)}
+          ${cell(escHtml(fmtMoney(laborLineTotal(i))),   1,'right',false,O,W)}
         </tr>`;
       });
     }
@@ -1090,11 +1197,13 @@ function buildRows(){
       ${cell(driveTechs+' Tech'+(driveTechs>1?'s':'')+', '+driveHrs+' '+(driveHrs===1?'Hour':'Hours')+' @ '+fmtMoney(driveRate)+'/hr', 4,'left', false,O,W)}
       ${cell(escHtml(fmtMoney(driveTotal)), 1,'right',false,O,W)}
     </tr>`;
-    totalLabor += driveTotal;
+    totalLaborC += driveTotalCents;
   }
 
   // ── Grand Total ──
-  const grand = totalBilled + totalLabor;
+  // Same single rounding point as the on-screen total, so the Word export
+  // and the app can never disagree about the price.
+  const grand = fromCents(grandTotalCents(totalBilledC + totalLaborC));
   rows += `<tr>
     <td colspan="4" bgcolor="${O}" style="border:1px solid ${BD};padding:7px 10px;">
       <b><font face="Times New Roman" color="${W}" size="3">Grand Total</font></b>
@@ -1154,9 +1263,14 @@ function clearAll(){
   pictures=[];activeId=null;
   document.getElementById('quoteName').value='';
   document.getElementById('clientName').value='';
+  // Drive time is per-job, so carrying it into the next job silently bills the
+  // new client for the last one's travel.
+  document.getElementById('globalDriveTechs').value='1';
+  document.getElementById('globalDriveHours').value='0';
+  document.getElementById('globalDriveRate').value='150';
   document.getElementById('outputModal').classList.remove('show');
   try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
-  addPicture();recalcTotals();
+  addPicture();recalcTotals();onDriveTimeChange();
 }
 
 /* ── init ── */
